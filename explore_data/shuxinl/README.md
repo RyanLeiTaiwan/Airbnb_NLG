@@ -25,6 +25,7 @@ To generate heatmap for one city:
 	python findKeywordsInCity.py [city]
 	
 For example:
+
 	python generateData.py Boston
 	python findNameEntites.py Boston Brighton
 	python findAdj.py Boston Brighton
