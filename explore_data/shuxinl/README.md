@@ -17,9 +17,15 @@ To find name entities, especially LOC, FAC, GPE, ...
 	python findNameEntites.py [city] [neighbourhood]
 
 To find adj which describe neighbourhood:
+
 	python findAdj.py [city] [neighbourhood] [keyword]
 
+To generate heatmap for one city:
+
+	python findKeywordsInCity.py [city]
+	
 For example:
 	python generateData.py Boston
 	python findNameEntites.py Boston Brighton
 	python findAdj.py Boston Brighton
+	python findKeywordsInCity.py Boston
