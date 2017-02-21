@@ -10,16 +10,16 @@ To install the spaCy model you need to run: (takes 1.3 GB)
 
 To generate imtermidiate data:
 
-`python generateData.py <city>`
+	python generateData.py [city]
 
 To find name entities, especially LOC, FAC, GPE, ...
 
-`python findNameEntites.py <city> <neighbourhood>`
+	python findNameEntites.py [city] [neighbourhood]
 
 To find adj which describe neighbourhood:
-`python findAdj.py <city> <neighbourhood> <keyword>`
+	python findAdj.py [city] [neighbourhood] [keyword]
 
 For example:
-> `python generateData.py Boston`
-	`python findNameEntites.py Boston Brighton `
-	`python findAdj.py Boston Brighton`
+	python generateData.py Boston
+	python findNameEntites.py Boston Brighton
+	python findAdj.py Boston Brighton
