@@ -37,10 +37,11 @@ spacy.util.set_data_path("/Users/susie/git/")
 nlp = spacy.load('en')
 city = sys.argv[1]
 neighbourhood = sys.argv[2]
+keyword = sys.argv[3]
 description = "./data/imtermidiate_data/" + city + "/" + neighbourhood + '.txt'
 
 with open(description, 'r') as myfile:
     text = myfile.read()
 
 doc = nlp(text.decode('utf-8'))
-print(get_character_adjectives(doc, 'cambridge'))
+print(get_character_adjectives(doc, keyword))

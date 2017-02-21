@@ -37,20 +37,20 @@ def find_character_occurences(doc):
             characters[ent.lemma_] += 1
             
     return characters.most_common()
-    
 
-reload(sys)
-sys.setdefaultencoding('utf8')
+if __name__ == "__main__":
+	reload(sys)
+	sys.setdefaultencoding('utf8')
 
-spacy.util.set_data_path("/Users/susie/git/") 
-nlp = spacy.load('en')
-city = sys.argv[1]
-neighbourhood = sys.argv[2]
-description = "./data/imtermidiate_data/" + city + "/" + neighbourhood + '.txt'
+	spacy.util.set_data_path("/Users/susie/git/") 
+	nlp = spacy.load('en')
+	city = sys.argv[1]
+	neighbourhood = sys.argv[2]
+	description = "./data/imtermidiate_data/" + city + "/" + neighbourhood + '.txt'
 
-with open(description, 'r') as myfile:
-    text = myfile.read()
+	with open(description, 'r') as myfile:
+	    text = myfile.read()
 
-doc = nlp(text.decode('utf-8'))
+	doc = nlp(text.decode('utf-8'))
 
-print(find_character_occurences(doc)[:20])
+	print(find_character_occurences(doc)[:10])
