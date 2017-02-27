@@ -16,15 +16,14 @@ neighbourhoods_file = "./data/raw_data/" + city + "_neighbourhoods.csv"
 with open(details_file) as f:
     reader = csv.DictReader(f) # read rows into a dictionary format
     for row in reader: # read a row as {column1: value1, column2: value2,...}
-        for (k,v) in row.items(): # go over each column name and value 
-            columns[k].append(v.decode('string_escape')) # append the value into the appropriate list
+        for (k,v) in row.items(): # go over each column name and value
+        	columns[k].append(v.decode('string_escape')) # append the value into the appropriate list
                                  # based on column name k
 
 text = columns['neighborhood_overview']
 neighbourhood = columns['neighbourhood_cleansed']
 
 mapping = dict()
-mapping
 for i in xrange(len(text)):
 	if text[i] != None:
 		mapping[text[i]] = neighbourhood[i]		
@@ -42,4 +41,5 @@ if not os.path.exists(new_folder):
 for key in grouped_data:
 	filename = key + '.txt'
 	with open(os.path.join(new_folder, filename), 'wb') as temp_file:
+
 	    temp_file.write("\n".join(grouped_data[key]))
