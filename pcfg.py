@@ -155,17 +155,19 @@ if __name__ == '__main__':
     #for pr in np_productions:
     #    print(pr.rhs())
 
+    # Set a "large enough" fixed max_generated so that recursion won't raise an exception
+    max_generated = 2000
     # Need to plus one to mysteriously workaround for prob_all in recursion
-    generator = generate(grammar, n=top_K+1)
+    generator = generate(grammar, n=max_generated+1)
     sentences = []
 
     # Collect the n generated sentences
     for sent in generator:
         sentence = ' '.join(sent)
         sentences.append(sentence)
-    # # Sort the sentences by descending probability
+    # Sort the sentences by descending probability
     sorted_idx = np.argsort(prob_all)[::-1]
 
     print('Top %d Sentences:' % top_K)
-    for rank, idx in enumerate(sorted_idx, 1):
+    for rank, idx in enumerate(sorted_idx[:top_K], 1):
         print('%03d [%e]: %s' % (rank, prob_all[idx], sentences[idx]))
