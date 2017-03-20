@@ -1,3 +1,6 @@
+# PyCharm settings
+.idea/
+
 # macOS .DS_store files
 .DS_Store
 
