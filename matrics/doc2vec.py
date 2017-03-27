@@ -30,3 +30,15 @@ if (os.path.exists("/tmp/small_corpus.dict")):
 	corpus = corpora.MmCorpus('/tmp/small_corpus.mm')
 	print("load dictionary and corpus!")
 
+# transformation: tfidf model
+tfidf = models.TfidfModel(corpus)
+corpus_tfidf = tfidf[corpus]
+tfidf.save('/tmp/small_corpus.tfidf')	# save model
+index = similarities.MatrixSimilarity(corpus_tfidf)	# index it
+index.save('/tmp/small_corpus.index')
+print("tfidf model transformation!")
+
+# similarity <-> variety
+new_description = "Live where the action is in this 3 bedroom, 2.0 bathroom Condominium right in heart of Seacliff. Welcome to our bright, comfortable Condominium in a premium neighborhood in San Francisco. Experience Seacliff, everything that's great about San Francisco all in one neighborhood."
+new_vec_bow = dictionary.doc2bow(new_description.lower().split())
+vec_tfidf = tfidf[new_vec_bow]
