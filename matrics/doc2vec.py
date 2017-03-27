@@ -31,14 +31,23 @@ if (os.path.exists("/tmp/small_corpus.dict")):
 	print("load dictionary and corpus!")
 
 # transformation: tfidf model
-tfidf = models.TfidfModel(corpus)
-corpus_tfidf = tfidf[corpus]
-tfidf.save('/tmp/small_corpus.tfidf')	# save model
+lsi = models.LsiModel(corpus)
+corpus_tfidf = lsi[corpus]
+lsi.save('/tmp/small_corpus.tfidf')	# save model
 index = similarities.MatrixSimilarity(corpus_tfidf)	# index it
 index.save('/tmp/small_corpus.index')
 print("tfidf model transformation!")
 
 # similarity <-> variety
-new_description = "Live where the action is in this 3 bedroom, 2.0 bathroom Condominium right in heart of Seacliff. Welcome to our bright, comfortable Condominium in a premium neighborhood in San Francisco. Experience Seacliff, everything that's great about San Francisco all in one neighborhood."
+new_description = "IF YOU SEE WEEKEND BOOKING -> means you are getting entire second floor to yourself as we normally go away traveling ourselves. A private room in SAN FRANCISCO in a brand-new  2 bedrooms apartment in the heart of the city !"
 new_vec_bow = dictionary.doc2bow(new_description.lower().split())
-vec_tfidf = tfidf[new_vec_bow]
+new_vec_tfidf = lsi[new_vec_bow]
+similarites = index[new_vec_tfidf]
+sim_rank_with_docid = sorted(enumerate(similarites), key=lambda item: -item[1])
+print sim_rank_with_docid
+print documents[sim_rank_with_docid[0][0]]
+print documents[sim_rank_with_docid[1][0]]
+print documents[sim_rank_with_docid[2][0]]
+
+
+
