@@ -177,7 +177,7 @@ if __name__ == '__main__':
     # top_K: number of top probability sentences to generate for each property
     if len(sys.argv) != 6:
         print('Usage: %s grammar_file csv_file skiprows nrows (-1 for all) top_K' % sys.argv[0])
-        print('Example: %s grammar/airbnb_dynamic.txt ../data/Airbnb/SanFrancisco_details.csv 0 3 20' % sys.argv[0])
+        print('Example: %s grammar/airbnb_grammar.txt ../data/Airbnb/SanFrancisco_details.csv 0 3 20' % sys.argv[0])
         exit(0)
     grammar_txt = open(sys.argv[1]).read()
     csv_file = sys.argv[2]
