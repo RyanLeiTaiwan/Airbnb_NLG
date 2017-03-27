@@ -1,7 +1,7 @@
 bedroom,2
 bathroom,2.5
 square_feet,2100
-neighbourhood,Squirrell Hill
+neighbourhood_cleansed,Squirrell Hill
 city,San Francisco
 property_type,apartment
 a:square_feet,spacious
