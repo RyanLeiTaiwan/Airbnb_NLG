@@ -2,6 +2,7 @@ import sys
 import re
 import copy
 import random
+import csv
 
 global_nodes = {}
 nodes = {}
@@ -17,6 +18,30 @@ def parse_data_file(data_file):
 		line = line.strip()
 		key, value = line.split(",")
 		data_dict[key.strip()] = value.strip()
+
+def build_dict(bdrm, bath, sqft, street, ngh, city, property_type):
+	global data_dict
+
+	data_dict = {}
+
+	data_dict["bedroom"] = bdrm
+	data_dict["bathroom"] = bath
+	data_dict["square_feet"] = sqft
+	data_dict["neighbourhood_cleansed"] = ngh
+	data_dict["city"] = city
+	data_dict["street_name"] = street.split(",")[0]
+	data_dict["property_type"] = property_type
+
+	# Temporary default values for things we cant generate yet...
+	data_dict["a:square_feet"] = "Spacious"
+	data_dict["distance_to"] = "A short walk"
+	data_dict["transportation"] = "The L train"
+	data_dict["a:property"] = "Modern"
+	data_dict["transport_hub"] = "Grand Central Station"
+	data_dict["neighbourhood_attractions"] = "CMU and Pitt"
+	data_dict["attraction_type"] = "Campuses"
+	data_dict["a:price"] = "Young"
+	data_dict["a:neighbourhood"] = "Affordable"
 
 def parse_string(string):
 	regex = re.compile("\[([^\]]*)\]")
@@ -67,7 +92,7 @@ class tree_node:
 					values.append(data_dict[key])
 				else:
 					values.append("[" + key + "]")
-			sys.stdout.write(self.text % tuple(values))
+			sys.stdout.write(self.text % tuple(values) + " ")
 		else:	
 			c = random.choice(self.children)
 			for child in c:
@@ -117,10 +142,18 @@ def build_tree(grammar_file):
 
 def main():
 	"""Tree"""
-	parse_data_file(sys.argv[2])
 	root = build_tree(sys.argv[1])
-	root.output()
-	print ""
 
+	with open(sys.argv[2], "rb") as csvfile:
+		counter = 0
+		city = csv.reader(csvfile, delimiter=',', quotechar='"')		
+		for row in city:
+			# bdrm, bath, sqft, street, ngh, city, property_type
+			build_dict(row[55], row[54], row[59], row[37], row[39], row[41], row[51])
+			root.output()
+			print "\n"
+			counter += 1
+			if counter > int(sys.argv[3]):
+				sys.exit()
 
 main()
