@@ -1,7 +1,16 @@
 bedroom,2
 bathroom,2.5
 square_feet,2100
-neighbourhood_cleansed,Squirrell Hill
-city,San Francisco
-property_type,apartment
-a:square_feet,spacious
+neighbourhood_cleansed,Shadyside
+city,Pittsburgh
+property_type,Apartment
+a:square_feet,Spacious
+distance_to,A short walk
+transportation,The 67 busline
+a:property,Modern
+transport_hub,Wilkins and Wightman bus stop
+neighbourhood_attractions,CMU and Pitt
+attraction_type,Campuses
+street_name,Wilkins Avenue
+a:price,Affordable
+a:neighbourhood,Safe

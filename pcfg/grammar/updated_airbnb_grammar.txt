@@ -1,0 +1,50 @@
+S -> INTRO NG_LOC TRANSPORT NG_ATT | INTRO CT_LOC TRANSPORT NG_ATT | INTRO STREET NG_ATT | INTRO STREET TRANSPORT
+
+INTRO -> INTRO_0 | INTRO_1 | INTRO_2 | INTRO_3 | INTRO_4 | INTRO_5 | INTRO_6 | INTRO_7 | INTRO_8 | INTRO_9
+
+INTRO_0 -> "[a:square_feet] [bedroom] bed [bathroom] bath"
+INTRO_1 -> "[a:square_feet] [bedroom]-bed"
+INTRO_2 -> "[a:property] [neighbourhood_cleansed] [bedroom] bedroom"
+INTRO_3 -> "[bedroom] bedroom, [bathroom] bathroom [property_type]"
+INTRO_4 -> "[a:property] [bedroom]bed"
+INTRO_5 -> "We have a [a:property], [a:square_feet] [bedroom] bedroom [property_type]"
+INTRO_6 -> "Enjoy all of the conveniences of the [neighbourhood_cleansed] lifestyle"
+INTRO_7 -> "Great [bedroom] bedroom [property_type]"
+INTRO_8 -> "[bedroom] bedroom in great location"
+INTRO_9 -> "[a:price] [bedroom] bed on [street_name]"
+
+NG_LOC -> NG_LOC_0 | NG_LOC_1 | NG_LOC_2
+
+NG_LOC_0 -> "available in [neighbourhood_cleansed]!"
+NG_LOC_1 -> ". It is in [neighbourhood_cleansed] neighborhood in [city]."
+NG_LOC_2 -> "in [neighbourhood_cleansed] area."
+
+CT_LOC -> "in the most sought after neighborhood in [city]"
+
+NG_ATT -> NG_ATT_0 | NG_ATT_1 | NG_ATT_2 | NG_ATT_3
+
+NG_ATT_0 -> "[distance_to] from [neighbourhood_attractions]."
+NG_ATT_1 -> "[distance_to] to [neighbourhood_attractions] and much more!"
+NG_ATT_2 -> "Nearby [attraction_type] include [neighbourhood_attractions]."
+NG_ATT_3 -> "Close to [neighbourhood_attractions]."
+
+STREET -> STREET_0 | STREET_1 | STREET_2 | STREET_3 | STREET_4
+
+STREET_0 -> "on [street_name] in [neighbourhood_cleansed]"
+STREET_1 -> "on a [a:neighbourhood] street"
+STREET_2 -> "on [street_name],"
+STREET_3 -> "located on [street_name]"
+STREET_4 -> "on one of the nicest streets in the [neighbourhood_cleansed] area."
+
+TRANSPORT -> TRANSPORT_0 | TRANSPORT_1 | TRANSPORT_2 | TRANSPORT_3
+
+TRANSPORT_0 -> "[transportation] is [distance_to] away."
+TRANSPORT_1 -> "around the corner from [transport_hub]."
+TRANSPORT_2 -> ". This [a:property] [property_type] has access to [transportation]!"
+TRANSPORT_3 -> "just [distance_to] from the [transport_hub]."
+
+
+
+
+
+
