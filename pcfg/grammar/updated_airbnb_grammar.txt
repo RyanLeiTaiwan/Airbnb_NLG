@@ -6,7 +6,7 @@ INTRO_0 -> "[a:square_feet] [bedroom] bed [bathroom] bath"
 INTRO_1 -> "[a:square_feet] [bedroom]-bed"
 INTRO_2 -> "[a:property] [neighbourhood_cleansed] [bedroom] bedroom"
 INTRO_3 -> "[bedroom] bedroom, [bathroom] bathroom [property_type]"
-INTRO_4 -> "[a:property] [bedroom]bed"
+INTRO_4 -> "[a:property] [bedroom]-bed"
 INTRO_5 -> "We have a [a:property], [a:square_feet] [bedroom] bedroom [property_type]"
 INTRO_6 -> "Enjoy all of the conveniences of the [neighbourhood_cleansed] lifestyle"
 INTRO_7 -> "Great [bedroom] bedroom [property_type]"
@@ -23,8 +23,8 @@ CT_LOC -> "in the most sought after neighborhood in [city]"
 
 NG_ATT -> NG_ATT_0 | NG_ATT_1 | NG_ATT_2 | NG_ATT_3
 
-NG_ATT_0 -> "[distance_to] from [neighbourhood_attractions]."
-NG_ATT_1 -> "[distance_to] to [neighbourhood_attractions] and much more!"
+NG_ATT_0 -> "[distance_attraction] from [neighbourhood_attractions]."
+NG_ATT_1 -> "[distance_attraction] to [neighbourhood_attractions] and much more!"
 NG_ATT_2 -> "Nearby [attraction_type] include [neighbourhood_attractions]."
 NG_ATT_3 -> "Close to [neighbourhood_attractions]."
 
@@ -38,10 +38,10 @@ STREET_4 -> "on one of the nicest streets in the [neighbourhood_cleansed] area."
 
 TRANSPORT -> TRANSPORT_0 | TRANSPORT_1 | TRANSPORT_2 | TRANSPORT_3
 
-TRANSPORT_0 -> "[transportation] is [distance_to] away."
+TRANSPORT_0 -> "[transportation] is [distance_transport] away."
 TRANSPORT_1 -> "around the corner from [transport_hub]."
 TRANSPORT_2 -> ". This [a:property] [property_type] has access to [transportation]!"
-TRANSPORT_3 -> "just [distance_to] from the [transport_hub]."
+TRANSPORT_3 -> "just [distance_transport] from the [transport_hub]."
 
 
 
