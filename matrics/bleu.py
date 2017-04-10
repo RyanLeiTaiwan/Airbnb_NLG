@@ -13,11 +13,13 @@ list_of_references = []
 
 cnt = 0
 for candi_raw in candidates:
+	candi_raw = candi_raw.decode('utf-8').strip()
 	candi_raw = word_tokenize(candi_raw)
 	list_of_candidates.append(candi_raw)
 	cnt += 1
 
 for ref_raw in refs:
+	ref_raw = ref_raw.decode('utf-8').strip()
 	ref_raw = word_tokenize(ref_raw)
 	list_of_references.append(ref_raw)
 
