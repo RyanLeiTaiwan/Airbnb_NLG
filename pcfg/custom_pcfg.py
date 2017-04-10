@@ -3,6 +3,7 @@ import re
 import copy
 import random
 import csv
+import query_locations as qry_locs
 
 global_nodes = {}
 nodes = {}
@@ -38,10 +39,10 @@ def build_dict(bdrm, bath, sqft, street, ngh, city, property_type):
 	data_dict["transportation"] = "The L train"
 	data_dict["a:property"] = "Modern"
 	data_dict["transport_hub"] = "Grand Central Station"
-	data_dict["neighbourhood_attractions"] = "CMU and Pitt"
-	data_dict["attraction_type"] = "Campuses"
-	data_dict["a:price"] = "Young"
-	data_dict["a:neighbourhood"] = "Affordable"
+	data_dict["neighbourhood_attractions"] = ", ".join(qry_locs.query_locations(city, ngh)[:4])
+	data_dict["attraction_type"] = "locations"
+	data_dict["a:price"] = "Affordable"
+	data_dict["a:neighbourhood"] = "Young"
 
 def parse_string(string):
 	regex = re.compile("\[([^\]]*)\]")
