@@ -4,6 +4,7 @@ import copy
 import random
 import csv
 import query_locations as qry_locs
+import google_api
 
 global_nodes = {}
 nodes = {}
@@ -20,11 +21,13 @@ def parse_data_file(data_file):
 		key, value = line.split(",")
 		data_dict[key.strip()] = value.strip()
 
-def build_dict(bdrm, bath, sqft, street, ngh, city, property_type):
+def build_dict(bdrm, bath, sqft, street, ngh, city, property_type,
+               lat, lng):
 	global data_dict
 
 	data_dict = {}
 
+	# Factual information
 	data_dict["bedroom"] = bdrm
 	data_dict["bathroom"] = bath
 	data_dict["square_feet"] = sqft
@@ -33,13 +36,20 @@ def build_dict(bdrm, bath, sqft, street, ngh, city, property_type):
 	data_dict["street_name"] = street.split(",")[0]
 	data_dict["property_type"] = property_type
 
+	# Mined information
+	# Top 4 neighborhood attractions
+	ngh_attractions = qry_locs.query_locations(city, ngh)[:4]
+	data_dict["neighbourhood_attractions"] = ", ".join(ngh_attractions)
+	data_dict["distance_attraction"] = google_api.distance_attractions(
+		lat=lat, lng=lng, att=ngh_attractions, max_walk=60)
+	# data_dict["distance_attraction"] = "A short walk"
+
 	# Temporary default values for things we cant generate yet...
 	data_dict["a:square_feet"] = "Spacious"
-	data_dict["distance_to"] = "A short walk"
 	data_dict["transportation"] = "The L train"
+	data_dict["distance_transport"] = "A short walk"
 	data_dict["a:property"] = "Modern"
 	data_dict["transport_hub"] = "Grand Central Station"
-	data_dict["neighbourhood_attractions"] = ", ".join(qry_locs.query_locations(city, ngh)[:4])
 	data_dict["attraction_type"] = "locations"
 	data_dict["a:price"] = "Affordable"
 	data_dict["a:neighbourhood"] = "Young"
@@ -162,7 +172,9 @@ def main():
 				break
 
 			# bdrm, bath, sqft, street, ngh, city, property_type
-			build_dict(row[55], row[54], row[59], row[37], row[39], row[41], row[51])
+			# lat, lng
+			build_dict(row[55], row[54], row[59], row[37], row[39], row[41], row[51],
+			           row[48], row[49])
 			root.output()
 			print "\n"
 
