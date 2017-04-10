@@ -6,6 +6,10 @@ import csv
 import query_locations as qry_locs
 import google_api
 
+from size_desc import adj_size
+from pet_desc import adj_pets
+from price_desc import adj_price
+
 global_nodes = {}
 nodes = {}
 
@@ -45,13 +49,13 @@ def build_dict(bdrm, bath, sqft, street, ngh, city, property_type,
 	# data_dict["distance_attraction"] = "A short walk"
 
 	# Temporary default values for things we cant generate yet...
-	data_dict["a:square_feet"] = "Spacious"
+	data_dict["a:square_feet"] = adj_size(row[53], row[54], row[55], row[56])
 	data_dict["transportation"] = "The L train"
 	data_dict["distance_transport"] = "A short walk"
 	data_dict["a:property"] = "Modern"
 	data_dict["transport_hub"] = "Grand Central Station"
 	data_dict["attraction_type"] = "locations"
-	data_dict["a:price"] = "Affordable"
+	data_dict["a:price"] = adj_price(row[53], row[60])
 	data_dict["a:neighbourhood"] = "Young"
 
 def parse_string(string):
