@@ -142,19 +142,28 @@ def build_tree(grammar_file):
 	return root
 
 def main():
-	"""Tree"""
+	# Check command-line arguments
+	if len(sys.argv) != 5:
+		print 'Usage: %s grammar csv #skip_rows #generate_rows' % sys.argv[0]
+		exit(0)
+
 	root = build_tree(sys.argv[1])
+	skip_rows = int(sys.argv[3])
+	generate_rows = int(sys.argv[4])
+	total_rows = skip_rows + generate_rows
 
 	with open(sys.argv[2], "rb") as csvfile:
-		counter = 0
-		city = csv.reader(csvfile, delimiter=',', quotechar='"')		
-		for row in city:
+		city = csv.reader(csvfile, delimiter=',', quotechar='"')
+		for counter, row in enumerate(city):
+			# Skip the first #skip_rows rows and header row
+			if counter <= skip_rows:
+				continue
+			elif counter > total_rows:
+				break
+
 			# bdrm, bath, sqft, street, ngh, city, property_type
 			build_dict(row[55], row[54], row[59], row[37], row[39], row[41], row[51])
 			root.output()
 			print "\n"
-			counter += 1
-			if counter > int(sys.argv[3]):
-				sys.exit()
 
 main()
