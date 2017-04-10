@@ -31,17 +31,29 @@ if (os.path.exists("/tmp/small_corpus.dict")):
 	print("load dictionary and corpus!")
 
 # transformation: tfidf model
-lsi = models.LsiModel(corpus)
-corpus_tfidf = lsi[corpus]
-lsi.save('/tmp/small_corpus.tfidf')	# save model
-index = similarities.MatrixSimilarity(corpus_tfidf)	# index it
+# Other transformation models:
+# Latent Semantic Indexing, LSI -> LsiModel
+# 	usage: model = models.LsiModel(tfidf_corpus, id2word=dictionary, num_topics=300)
+# Random Projections, RP -> RpModel
+# 	usage: model = models.RpModel(tfidf_corpus, num_topics=500)
+# Latent Dirichlet Allocation, LDA -> LdaModel
+# 	usage: model = models.LdaModel(corpus, id2word=dictionary, num_topics=100)
+# Hierarchical Dirichlet Process, HDP -> HdpModel
+# 	usage: model = models.HdpModel(corpus, id2word=dictionary)
+
+
+model = models.LsiModel(corpus)
+corpus_ = model[corpus]
+index = similarities.MatrixSimilarity(corpus_)	# index it
+
+model.save('/tmp/small_corpus.tfidf')	# save model
 index.save('/tmp/small_corpus.index')
-print("tfidf model transformation!")
+print("model transformation!")
 
 # similarity <-> variety
 new_description = "IF YOU SEE WEEKEND BOOKING -> means you are getting entire second floor to yourself as we normally go away traveling ourselves. A private room in SAN FRANCISCO in a brand-new  2 bedrooms apartment in the heart of the city !"
 new_vec_bow = dictionary.doc2bow(new_description.lower().split())
-new_vec_tfidf = lsi[new_vec_bow]
+new_vec_tfidf = model[new_vec_bow]
 similarites = index[new_vec_tfidf]
 sim_rank_with_docid = sorted(enumerate(similarites), key=lambda item: -item[1])
 print sim_rank_with_docid
