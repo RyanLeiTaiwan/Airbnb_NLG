@@ -1,7 +1,8 @@
 import csv
 from collections import defaultdict
 
-reader = csv.reader(open("data.csv", "rb"))
+# Comment this function so this file can be imported
+# reader = csv.reader(open("data.csv", "rb"))
 
 def adj_pets(amenity):
 	if amenity.lower().find("pets allowed") != -1:
@@ -15,4 +16,5 @@ def overview():
 		if amenity.find("pets allowed") != -1:
 			print(amenity)
 
-overview()
+if __name__ == '__main__':
+	overview()

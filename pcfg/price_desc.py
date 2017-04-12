@@ -1,7 +1,8 @@
 import csv
 from collections import defaultdict
 
-reader = csv.reader(open("data.csv", "rb"))
+# Comment this function so this file can be imported
+# reader = csv.reader(open("data.csv", "rb"))
 
 def adj_price(accom, price):
 	try:
@@ -48,6 +49,7 @@ def overview():
 
 	#print price_list
 
-#overview()
-test()
+if __name__ == '__main__':
+	overview()
+	# test()
 			

@@ -4,7 +4,9 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from collections import defaultdict
 
-reader = csv.reader(open("data.csv", "rb"))
+# Comment this function so this file can be imported
+# reader = csv.reader(open("data.csv", "rb"))
+
 
 def adj_size(accom, ba, br, beds):
 	try:
@@ -108,7 +110,8 @@ def test():
 			first_flag = False
 			continue	
 		print adj_size_ml(line[16], line[17], line[18], line[19])
-	
-#train()
-#test()
-#overview()
+
+if __name__ == '__main__':
+	# train()
+	# test()
+	overview()

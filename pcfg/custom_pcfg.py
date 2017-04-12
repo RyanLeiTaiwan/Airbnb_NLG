@@ -4,16 +4,24 @@ import copy
 import random
 import csv
 import query_locations as qry_locs
-import google_api
+from operator import itemgetter
 
+# Minxing
 from size_desc import adj_size
 from pet_desc import adj_pets
 from price_desc import adj_price
 
+# Ryan
+import googlemaps # pip install googlemaps
+import google_api
+# Global Google API object
+apikey = 'AIzaSyDpC11dt2AcHTva0XhKhwC3J0kvVJIGdkM'
+api = googlemaps.Client(key=apikey)
+
 global_nodes = {}
 nodes = {}
-
 data_dict = {}
+
 
 def parse_data_file(data_file):
 	global data_dict
@@ -25,13 +33,20 @@ def parse_data_file(data_file):
 		key, value = line.split(",")
 		data_dict[key.strip()] = value.strip()
 
-def build_dict(bdrm, bath, sqft, street, ngh, city, property_type,
-               lat, lng):
-	global data_dict
+def build_dict(row):
+	global data_dict, api
 
 	data_dict = {}
 
-	# Factual information
+	# Get the specific columns
+	# accommodates, bedrooms, bathrooms, square_feet, street, neighbourhood_cleansed, city,
+	# property_type, price, latitude, longitude
+	(accm, bath, bdrm, beds, sqft, street, ngh, city,
+	 property_type, price, lat, lng) \
+		= itemgetter(53, 54, 55, 56, 59, 37, 39, 41,
+		             51, 60, 48, 49)(row)
+
+# Factual information
 	data_dict["bedroom"] = bdrm
 	data_dict["bathroom"] = bath
 	data_dict["square_feet"] = sqft
@@ -41,21 +56,24 @@ def build_dict(bdrm, bath, sqft, street, ngh, city, property_type,
 	data_dict["property_type"] = property_type
 
 	# Mined information
-	# Top 4 neighborhood attractions
-	ngh_attractions = qry_locs.query_locations(city, ngh)[:4]
+	# Adjectives for square feet and price
+	data_dict["a:square_feet"] = adj_size(accm, bath, bdrm, beds)
+	data_dict["a:price"] = adj_price(accm, price)
+	# data_dict["a:square_feet"] = adj_size(row[53], row[54], row[55], row[56])
+	# data_dict["a:price"] = adj_price(row[53], row[60])
+
+	# Top 3 neighborhood attractions
+	ngh_attractions = qry_locs.query_locations(city, ngh)[:3]
 	data_dict["neighbourhood_attractions"] = ", ".join(ngh_attractions)
 	data_dict["distance_attraction"] = google_api.distance_attractions(
-		lat=lat, lng=lng, att=ngh_attractions, max_walk=60)
-	# data_dict["distance_attraction"] = "A short walk"
+		api, lat, lng, city, ngh_attractions, max_walk=30)
 
 	# Temporary default values for things we cant generate yet...
-	data_dict["a:square_feet"] = adj_size(row[53], row[54], row[55], row[56])
 	data_dict["transportation"] = "The L train"
 	data_dict["distance_transport"] = "A short walk"
 	data_dict["a:property"] = "Modern"
 	data_dict["transport_hub"] = "Grand Central Station"
 	data_dict["attraction_type"] = "locations"
-	data_dict["a:price"] = adj_price(row[53], row[60])
 	data_dict["a:neighbourhood"] = "Young"
 
 def parse_string(string):
@@ -91,7 +109,7 @@ class tree_node:
 				self.children.append(copy.deepcopy(labels))
 				for x in labels:
 					if x not in global_nodes:
-						global_nodes[x] = tree_node(x, nodes[x])		
+						global_nodes[x] = tree_node(x, nodes[x])
 			else:
 				# Leaf node
 				tup = parse_string(st[1:len(st)-1])
@@ -108,7 +126,7 @@ class tree_node:
 				else:
 					values.append("[" + key + "]")
 			sys.stdout.write(self.text % tuple(values) + " ")
-		else:	
+		else:
 			c = random.choice(self.children)
 			for child in c:
 				global_nodes[child].output()
@@ -123,7 +141,7 @@ def build_tree(grammar_file):
 	global nodes
 
 	f = open(grammar_file, "r")
-	
+
 	for line in f:
 		line = line.strip()
 		if len(line) > 0:
@@ -144,7 +162,7 @@ def build_tree(grammar_file):
 					nodes[label].append(x.strip())
 
 	f.close()
-	
+
 	n = None
 	try:
 		n = nodes['S']
@@ -175,11 +193,10 @@ def main():
 			elif counter > total_rows:
 				break
 
-			# bdrm, bath, sqft, street, ngh, city, property_type
-			# lat, lng
-			build_dict(row[55], row[54], row[59], row[37], row[39], row[41], row[51],
-			           row[48], row[49])
+			# Pass the whole row and get specific indices in the function
+			build_dict(row)
 			root.output()
 			print "\n"
 
-main()
+if __name__ == '__main__':
+	main()
