@@ -193,10 +193,12 @@ def main():
 			elif counter > total_rows:
 				break
 
-			# Pass the whole row and get specific indices in the function
+			# Pass the whole row and specify indices in the function
 			build_dict(row)
 			root.output()
-			print "\n"
+			# Additional newlines
+			# print
+			print
 
 if __name__ == '__main__':
 	main()
