@@ -1,12 +1,13 @@
 import csv
 import numpy as np
+import pandas as pd
+
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from collections import defaultdict
 
-# Comment this function so this file can be imported
-# reader = csv.reader(open("data.csv", "rb"))
 
+csvFile = "/home/extrared/Documents/Airbnb/src/Boston_details.csv"
 
 def adj_size(accom, ba, br, beds):
 	try:
@@ -30,67 +31,73 @@ def adj_size_ml(accom, ba, br, beds):
 	else:
 		return "cozy"
 
-def overview():
+def overview(df_size_info):
 	cnt = 0
 	accom = defaultdict(float)
 	ba = defaultdict(float)
 	br = defaultdict(float)
 	bed = defaultdict(float)
-	guest = defaultdict(float)
 
-	spacious = 0
+	sp_accom = defaultdict(float)
+	sp_ba = defaultdict(float)
+	sp_br = defaultdict(float)
+	sp_bed = defaultdict(float)
+
+
+	tot_spacious = 0
+	pred_spacious = 0
 	matched = 0
-
-	print "property_type, room_type, accom, ba, br, beds, bed_type, guests"
-	for line in reader:
+	print "property_type, room_type, accommodates, beds, bedrooms, bathrooms"
+	for index, row in df_size_info.iterrows():	
 		cnt += 1
-		try:
-			accom[float(line[16])] += 1
-			ba[float(line[17])] += 1
-			br[float(line[18])] += 1
-			bed[float(line[19])] += 1
-			guest[float(line[-1])] += 1
-			
-			if float(line[16]) >= 3 and float(line[17]) >= 1 and float(line[18]) >= 2 and float(line[19]) >= 2:
-				spacious += 1
-				if line[2].find("spacious") != -1:
-					matched += 1
-		except ValueError:
-			pass
+		accomodates = row['accommodates']
+		bathroom = row['bathrooms']
+		bedroom = row['bedrooms']
+		beds = row['beds']
+	
+		accom[accomodates] += 1
+		ba[bathroom] += 1
+		br[bedroom] += 1
+		bed[beds] += 1
 
-		#if line[2].find("spacious") != -1:
-		#	print line[15:22], line[-1]
-	print accom
-	print ba
-	print br
-	print bed
-	print guest
-	print spacious, matched
+		if row['description'].find("spacious") != -1:
+			tot_spacious += 1
+			sp_accom[accomodates] += 1
+			sp_ba[bathroom] += 1
+			sp_br[bedroom] += 1
+			sp_bed[beds] += 1	
 
-def gen_features(indices):
+		if float(accomodates) >= 3 and float(bathroom) >= 1 and float(bedroom) >= 2:
+			pred_spacious += 1
+			if row['description'].find("spacious") != -1:
+				matched += 1
+	print "accomo", sp_accom, accom
+	print "bathrooms", sp_ba, ba
+	print "bedrooms", sp_br, br
+	print "beds", sp_bed, bed
+	print tot_spacious, pred_spacious, matched
+
+def gen_features(feature_set, df_size_info):
 	first_flag = True
 	X = []
 	y = []
-	for line in reader:
+	for index, row in df_size_info.iterrows():
 		if first_flag:
 			first_flag = False
 			continue
 		one_feature = []
-		for i in indices:
-			if len(line[i]) != 0:
-				one_feature.append(float(line[i]))
-			else:
-				one_feature.append(0.0)
+		for f in feature_set:
+			one_feature.append(float(row[f]))
 		X.append(one_feature)
-		if line[2].find("spacious") != -1:
+		if row['description'].find("spacious") != -1:
 			y.append(1)
 		else:
 			y.append(0)
 	return X, y
 
-def train():
-	indices = [16, 17, 18, 19]
-	X, y = gen_features(indices)
+def train(df_size_info):
+	indices = ["accommodates", "bathrooms", "beds", "bedrooms"]
+	X, y = gen_features(indices, df_size_info)
 	print np.sum(y)
 	#clf = SVC(gamma=3, C=1)
 	clf = LogisticRegression(C=0.001, penalty='l2', tol=0.001, class_weight="auto")
@@ -112,6 +119,9 @@ def test():
 		print adj_size_ml(line[16], line[17], line[18], line[19])
 
 if __name__ == '__main__':
-	# train()
+	df = pd.read_csv(csvFile)
+	df_size_info = df.loc[:, ['description', 'property_type', 'room_type', 'accommodates', 'beds', 'bedrooms', 'bathrooms']]
+	df_size_info = df_size_info.fillna(0.0)
+	#train(df_size_info)
 	# test()
-	overview()
+	overview(df_size_info)

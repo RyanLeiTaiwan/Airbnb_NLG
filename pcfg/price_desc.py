@@ -1,8 +1,8 @@
 import csv
+import pandas as pd
 from collections import defaultdict
 
-# Comment this function so this file can be imported
-# reader = csv.reader(open("data.csv", "rb"))
+csvFile = "/home/extrared/Documents/Airbnb/src/Boston_details.csv"
 
 def adj_price(accom, price):
 	try:
@@ -11,9 +11,9 @@ def adj_price(accom, price):
                 price = float(price_str)
                 price_per = price/guests
 
-		if price_per < 34:
+		if price_per < 39:
 			return "cheap"
-		elif price_per < 116:
+		elif price_per < 98:
 			return "affordable"
 		else:
 			return "luxurious"
@@ -25,18 +25,12 @@ def test():
 	for line in reader:
 		print adj_price(line[16], line[23])
 
-def overview():
+def overview(df_price_info):
 	price_list = []
 
-	for line in reader:
-		try:
-			guests = float(line[16])
-			price_str = line[23].replace("$","").replace(",","")
-			price = float(price_str)
-			price_list.append(price/guests)
-		except:
-			print line[16], line[23]
-			continue
+	for index, row in df_price_info.iterrows():
+		guests = float(row['accommodates'])
+		price_list.append(row['price']/guests)
 
 	price_list = list(set(price_list))
 	price_list.sort()
@@ -50,6 +44,10 @@ def overview():
 	#print price_list
 
 if __name__ == '__main__':
-	overview()
+	df = pd.read_csv(csvFile, converters={'price': lambda s: float(s.replace('$', '').replace(',', ''))})
+	df_price_info = df.loc[:, ['description', 'accommodates', 'price']]
+	df_price_info = df_price_info.fillna(0.0)
+
+	overview(df_price_info)
 	# test()
 			
