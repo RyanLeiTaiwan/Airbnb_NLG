@@ -7,4 +7,5 @@ Usage:
 - (Optional) **output_random**: the output file for random choices of mined information.
 
 Standard output will always print the normal PCFG version with an additional newline after one property.
-Output files will be exactly one line per property.
+
+File output will be exactly one line per property.
