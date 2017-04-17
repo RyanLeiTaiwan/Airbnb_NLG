@@ -16,7 +16,7 @@ worker_count = 1 #number of parallel processes
 #pretrained word embeddings
 pretrained_emb = "pretrained_word_embeddings.txt"
 #input corpus
-train_corpus = "large_corpus.txt"
+train_corpus = "Boston.txt"
 
 #output model
 saved_path = "model.bin"
