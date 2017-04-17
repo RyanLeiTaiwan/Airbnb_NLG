@@ -1,7 +1,8 @@
 from gensim import corpora, models, similarities
 from collections import defaultdict
-import os 
-with open('small_corpus.txt') as f:
+import os
+import sys 
+with open(sys.argv[1]) as f:
 	lines = f.read().splitlines()
 lines = [line.strip() for line in lines]
 documents = lines
@@ -51,10 +52,11 @@ index.save('/tmp/small_corpus.index')
 print("model transformation!")
 
 # similarity <-> variety
-new_description = "IF YOU SEE WEEKEND BOOKING -> means you are getting entire second floor to yourself as we normally go away traveling ourselves. A private room in SAN FRANCISCO in a brand-new  2 bedrooms apartment in the heart of the city !"
+new_description = "Charming and quiet room in a second floor 1910 condo building. The room has a full size bed, darkening curtains, window A/C unit. It's quiet because it's in the back of the house. Shared bathroom. Guests can use kitchen, living room. Pet friendly."
 new_vec_bow = dictionary.doc2bow(new_description.lower().split())
 new_vec_tfidf = model[new_vec_bow]
 similarites = index[new_vec_tfidf]
+print similarites
 sim_rank_with_docid = sorted(enumerate(similarites), key=lambda item: -item[1])
 print sim_rank_with_docid
 print documents[sim_rank_with_docid[0][0]]

@@ -15,5 +15,5 @@ python calculateInnerDistance.py [test_vectors]
 
 ### calculate similarity between two vectors (similarity)
 ```
-python calculateOuterSiimilarity.py [test_vectors1] [test_vectors2]
+python calculateOuterSimilarity.py [test_vectors1] [test_vectors2]
 ```
