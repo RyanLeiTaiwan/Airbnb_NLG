@@ -35,6 +35,10 @@ original Airbnb vs. pcfg:
 	* LDA: 0.109430402219
 	* HDP: 0.0781604666263
 
+original Airbnb vs. random_pcfg:
+- bleu: 0.00461131633324
+- doc2vec: 0.914274664323
+
 ### Variety inside one document
 
 original Airbnb:
