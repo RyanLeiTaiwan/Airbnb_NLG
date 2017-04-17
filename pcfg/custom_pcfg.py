@@ -6,6 +6,7 @@ import csv
 import query_locations as qry_locs
 from operator import itemgetter
 import query_trendy as qry_trendy
+import numpy as np
 
 # Minxing
 from size_desc import adj_size
@@ -47,7 +48,7 @@ def build_dict(row):
 		= itemgetter(53, 54, 55, 56, 59, 37, 39, 41,
 		             51, 60, 48, 49)(row)
 
-# Factual information
+	# Factual information
 	data_dict["bedroom"] = bdrm
 	data_dict["bathroom"] = bath
 	data_dict["square_feet"] = sqft
@@ -175,6 +176,9 @@ def build_tree(grammar_file):
 	return root
 
 def main():
+	# Set a fixed random seed when we need to evaluate mined vs. random
+	np.random.seed(11632)
+
 	# Check command-line arguments
 	if len(sys.argv) != 5:
 		print 'Usage: %s grammar csv #skip_rows #generate_rows' % sys.argv[0]

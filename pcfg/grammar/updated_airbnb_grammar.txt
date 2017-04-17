@@ -15,8 +15,8 @@ INTRO_9 -> "[a:price] [bedroom] bed on [street_name]"
 
 NG_LOC -> NG_LOC_0 | NG_LOC_1 | NG_LOC_2
 
-NG_LOC_0 -> "available in [neighbourhood_cleansed]!"
-NG_LOC_1 -> ". It is in [neighbourhood_cleansed] neighborhood in [city]."
+NG_LOC_0 -> "available in the [a:neighbourhood] [neighbourhood_cleansed]!"
+NG_LOC_1 -> ". It is in the [neighbourhood_cleansed] neighborhood in [city]."
 NG_LOC_2 -> "in [neighbourhood_cleansed] area."
 
 CT_LOC -> "in the most sought after neighborhood in [city]"
@@ -30,7 +30,7 @@ NG_ATT_3 -> "Close to [neighbourhood_attractions]."
 
 STREET -> STREET_0 | STREET_1 | STREET_2 | STREET_3 | STREET_4
 
-STREET_0 -> "on [street_name] in [neighbourhood_cleansed]"
+STREET_0 -> "on [street_name] in the [a:neighbourhood] [neighbourhood_cleansed]"
 STREET_1 -> "on a [a:neighbourhood] street"
 STREET_2 -> "on [street_name],"
 STREET_3 -> "located on [street_name]"

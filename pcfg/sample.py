@@ -20,7 +20,10 @@ if __name__ == '__main__':
 	# Output human summary as well
 	output_human = sys.argv[4]
 
-	dtype_dict = {'id': np.str, 'neighbourhood_cleansed': 'category'}
+	dtype_dict = {
+		'id': np.str, 'accommodates': 'category', 'bathrooms': 'category', 'bedrooms': 'category',
+		'beds': 'category', 'neighbourhood_cleansed': 'category'
+	}
 	df_all = pd.read_csv(input_csv, dtype=dtype_dict)
 	# [Not needed] replace NaN values with '' in targeted textual columns
 	# http://stackoverflow.com/questions/36556256/how-do-i-fill-na-values-in-multiple-columns-in-pandas
@@ -31,9 +34,10 @@ if __name__ == '__main__':
 	print 'Original distribution:'
 	print df_all.groupby('neighbourhood_cleansed').size().sort_values(ascending=False)
 
-	# Randomly sample num_samples rows with non-nan summary, sorted by original index
-	# Safely sample num_samples * 1.2 rows => drop summary NA => pick the first num_samples rows => sort by index
-	df_sample = df_all.sample(n=int(num_samples * 1.2)).dropna(subset=['summary']).head(num_samples).sort_index()
+	# Randomly sample num_samples rows with non-NaN [summary, numeric columns], sorted by original index
+	# Safely sample num_samples * 1.2 rows => drop NAs => pick the first num_samples rows => sort by index
+	df_sample = df_all.sample(n=int(num_samples * 1.2)).dropna(how='any',
+		subset=['summary', 'accommodates', 'bathrooms', 'bedrooms', 'beds']).head(num_samples).sort_index()
 	print
 	print 'Sampled distribution:'
 	print df_sample.groupby('neighbourhood_cleansed').size().sort_values(ascending=False)
