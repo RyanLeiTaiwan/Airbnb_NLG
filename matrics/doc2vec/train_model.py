@@ -2,7 +2,7 @@
 
 import gensim.models as g
 import logging
-
+import sys
 #doc2vec parameters
 vector_size = 300
 window_size = 15
@@ -16,7 +16,7 @@ worker_count = 1 #number of parallel processes
 #pretrained word embeddings
 pretrained_emb = "pretrained_word_embeddings.txt"
 #input corpus
-train_corpus = "large_corpus.txt"
+train_corpus = sys.argv[1]
 
 #output model
 saved_path = "model.bin"

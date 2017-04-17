@@ -1,11 +1,12 @@
 #python example to infer document vectors from trained doc2vec model
 import gensim.models as g
 import codecs
+import sys
 
 #parameters
 model="model.bin"
-test_docs="auto-generated.txt"
-output_file="test_vectors.txt"
+test_docs=sys.argv[1]
+output_file=sys.argv[2]
 
 #inference hyper-parameters
 start_alpha=0.01
