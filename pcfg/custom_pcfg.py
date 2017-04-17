@@ -1,8 +1,10 @@
+# -*- coding: UTF-8 -*-
 import sys
 import re
 import copy
 import random
 import csv
+import pickle
 import query_locations as qry_locs
 from operator import itemgetter
 import query_trendy as qry_trendy
@@ -23,8 +25,13 @@ api = googlemaps.Client(key=apikey)
 global_nodes = {}
 nodes = {}
 data_dict = {}
+data_dict_rand = {}
+
+# Set a fixed random seed when we need reproducible results
+random.seed(11632)
 
 
+""" No longer used (prop.info)
 def parse_data_file(data_file):
 	global data_dict
 
@@ -34,11 +41,13 @@ def parse_data_file(data_file):
 		line = line.strip()
 		key, value = line.split(",")
 		data_dict[key.strip()] = value.strip()
+"""
 
 def build_dict(row):
-	global data_dict, api
+	global data_dict, data_dict_rand, api
 
 	data_dict = {}
+	data_dict_rand = {}
 
 	# Get the specific columns
 	# accommodates, bedrooms, bathrooms, square_feet, street, neighbourhood_cleansed, city,
@@ -57,26 +66,55 @@ def build_dict(row):
 	data_dict["street_name"] = street.split(",")[0]
 	data_dict["property_type"] = property_type
 
-	# Mined information
+	# Temporary default values for things we cant generate yet...
+	data_dict["transportation"] = "[The L train]"
+	data_dict["distance_transport"] = "[A short walk]"
+	data_dict["a:property"] = "[Modern]"
+	data_dict["transport_hub"] = "[Grand Central Station]"
+	data_dict["attraction_type"] = "[locations]"
+
+	# Deep copy data_dict to data_dict_rand
+	data_dict_rand = copy.deepcopy(data_dict)
+
+	### Mined information
 	# Adjectives for square feet and price
 	data_dict["a:square_feet"] = adj_size(accm, bath, bdrm, beds)
 	data_dict["a:price"] = adj_price(accm, price)
-	# data_dict["a:square_feet"] = adj_size(row[53], row[54], row[55], row[56])
-	# data_dict["a:price"] = adj_price(row[53], row[60])
-
 	# Top 3 neighborhood attractions
 	ngh_attractions = qry_locs.query_locations(city, ngh)[:3]
 	data_dict["neighbourhood_attractions"] = ", ".join(ngh_attractions)
 	data_dict["distance_attraction"] = google_api.distance_attractions(
 		api, lat, lng, city, ngh_attractions, max_walk=30)
-
-	# Temporary default values for things we cant generate yet...
-	data_dict["transportation"] = "The L train"
-	data_dict["distance_transport"] = "A short walk"
-	data_dict["a:property"] = "Modern"
-	data_dict["transport_hub"] = "Grand Central Station"
-	data_dict["attraction_type"] = "locations"
+	# Adjective (trendy or quiet) for neighborhood
 	data_dict["a:neighbourhood"] = qry_trendy.query_trendy(city, ngh)
+
+	### Random versions of mined information
+	data_dict_rand["a:square_feet"] = random.choice(['spacious', 'cozy'])
+	data_dict_rand["a:price"] = random.choice(['cheap', 'affordable', 'luxurious'])
+
+	# Instead of top 3 attractions in the correct neighborhood, choose 3 random city-level attractions
+	city_attractions = []
+	try:
+		# Workaround to know the list of neighborhood in current city
+		picklefile = open("ngh_locations/ngh_data/pickle/" + str(city).lower() + ".pickle", "r")
+	except:
+		# City name is wrong: do nothing
+		pass
+	else:
+		dic = pickle.load(picklefile)
+		# Build the attraction list every time (time-consuming)
+		for attr in dic.values():
+			city_attractions += attr
+	ngh_attractions_rand = []
+	length = len(city_attractions)
+	if length > 3:
+		ngh_attractions_rand = random.sample(city_attractions, 3)
+	elif length > 0:
+		ngh_attractions_rand = random.sample(city_attractions, length)
+
+	data_dict_rand["neighbourhood_attractions"] = ", ".join(ngh_attractions_rand)
+	data_dict_rand["distance_attraction"] = random.choice(['A short walk', 'A short drive'])
+	data_dict_rand["a:neighbourhood"] = random.choice(['trendy', 'quiet'])
 
 def parse_string(string):
 	regex = re.compile("\[([^\]]*)\]")
@@ -119,19 +157,40 @@ class tree_node:
 				self.fillers = copy.deepcopy(tup[1])
 				self.set_leaf()
 
-	def output(self):
+	def output(self, output_pcfg, output_random):
 		if self.is_leaf:
 			values = []
+			values_rand = []
 			for key in self.fillers:
 				if key in data_dict:
 					values.append(data_dict[key])
+					values_rand.append(data_dict_rand[key])
 				else:
 					values.append("[" + key + "]")
+					values_rand.append("[" + key + "]")
+			# Print only the normal version on stdout
 			sys.stdout.write(self.text % tuple(values) + " ")
+			# Write both the normal and random versions to files
+			try:
+				if output_pcfg:
+					output_pcfg.write(self.text % tuple(values) + " ")
+			except UnicodeEncodeError:
+				# TODO: Fix the unicode problem values
+				# print 'self.text: ' + str(self.text)
+				# print 'tuple(values): ' + str(tuple(values))
+				pass
+			try:
+				if output_random:
+					output_random.write(self.text % tuple(values_rand) + " ")
+			except UnicodeEncodeError:
+				# TODO: Fix the unicode problem values
+				# print 'self.text: ' + str(self.text)
+				# print 'tuple(values_rand): ' + str(tuple(values_rand))
+				pass
 		else:
 			c = random.choice(self.children)
 			for child in c:
-				global_nodes[child].output()
+				global_nodes[child].output(output_pcfg, output_random)
 
 	def set_leaf(self):
 		self.is_leaf = True
@@ -176,18 +235,22 @@ def build_tree(grammar_file):
 	return root
 
 def main():
-	# Set a fixed random seed when we need to evaluate mined vs. random
-	np.random.seed(11632)
-
 	# Check command-line arguments
-	if len(sys.argv) != 5:
-		print 'Usage: %s grammar csv #skip_rows #generate_rows' % sys.argv[0]
+	argc = len(sys.argv)
+	if argc != 5 and argc != 7:
+		print 'Usage: %s grammar csv #skip_rows #generate_rows [output_pcfg output_random]' % sys.argv[0]
 		exit(0)
 
 	root = build_tree(sys.argv[1])
 	skip_rows = int(sys.argv[3])
 	generate_rows = int(sys.argv[4])
 	total_rows = skip_rows + generate_rows
+
+	output_pcfg = None
+	output_random = None
+	if argc == 7:
+		output_pcfg = open(sys.argv[5], 'w')
+		output_random = open(sys.argv[6], 'w')
 
 	with open(sys.argv[2], "rb") as csvfile:
 		city = csv.reader(csvfile, delimiter=',', quotechar='"')
@@ -198,12 +261,16 @@ def main():
 			elif counter > total_rows:
 				break
 
-			# Pass the whole row and specify indices in the function
+			# random = True: Use random adjectives instead of mined adjectives
 			build_dict(row)
-			root.output()
+			root.output(output_pcfg, output_random)
 			# Additional newlines
-			# print
 			print
+			print
+			if output_pcfg:
+				output_pcfg.write('\n')
+			if output_random:
+				output_random.write('\n')
 
 if __name__ == '__main__':
 	main()

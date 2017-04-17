@@ -1,10 +1,10 @@
 import sys
 import pandas as pd
 import numpy as np
+# Set random seed when we need reproducible results
+np.random.seed(11632)
 
 if __name__ == '__main__':
-	# Set random seed so the result is reproducible
-	np.random.seed(11632)
 	pd.set_option('display.width', 150)
 	pd.set_option('max_colwidth', 80)
 	pd.set_option('max_rows', 500)
