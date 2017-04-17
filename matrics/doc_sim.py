@@ -1,9 +1,13 @@
 from gensim import corpora, models, similarities
 from collections import defaultdict
 import os
-import sys 
-with open(sys.argv[1]) as f:
-	lines = f.read().splitlines()
+import sys
+
+file1 = sys.argv[1]
+file2 = sys.argv[2]
+
+with open(file1) as f1:
+	lines = f1.read().splitlines()
 lines = [line.strip() for line in lines]
 documents = lines
 
@@ -43,7 +47,7 @@ if (os.path.exists("/tmp/small_corpus.dict")):
 # 	usage: model = models.HdpModel(corpus, id2word=dictionary)
 
 
-model = models.LsiModel(corpus)
+model = models.TfidfModel(corpus)
 corpus_ = model[corpus]
 index = similarities.MatrixSimilarity(corpus_)	# index it
 
@@ -52,16 +56,25 @@ index.save('/tmp/small_corpus.index')
 print("model transformation!")
 
 # similarity <-> variety
-new_description = "Charming and quiet room in a second floor 1910 condo building. The room has a full size bed, darkening curtains, window A/C unit. It's quiet because it's in the back of the house. Shared bathroom. Guests can use kitchen, living room. Pet friendly."
-new_vec_bow = dictionary.doc2bow(new_description.lower().split())
-new_vec_tfidf = model[new_vec_bow]
-similarites = index[new_vec_tfidf]
-print similarites
-sim_rank_with_docid = sorted(enumerate(similarites), key=lambda item: -item[1])
-print sim_rank_with_docid
-print documents[sim_rank_with_docid[0][0]]
-print documents[sim_rank_with_docid[1][0]]
-print documents[sim_rank_with_docid[2][0]]
+with open(file2) as f2:
+	lines = f2.read().splitlines()
+lines2 = [line.strip() for line in lines]
+
+num = 0
+dist_sum = 0.0
+for new_description in lines2:
+	new_vec_bow = dictionary.doc2bow(new_description.lower().split())
+	new_vec_tfidf = model[new_vec_bow]
+	similarites = index[new_vec_tfidf]
+	sim_rank_with_docid = sorted(enumerate(similarites), key=lambda item: -item[1])
+	id = [x for x, y in enumerate(sim_rank_with_docid) if y[0] == num]
+	id = id[0]
+	dist_sum += sim_rank_with_docid[id][1]
+	num += 1
+print dist_sum/num
+# print documents[]
+# print documents[sim_rank_with_docid[1]]
+# print documents[sim_rank_with_docid[2]]
 
 
 
