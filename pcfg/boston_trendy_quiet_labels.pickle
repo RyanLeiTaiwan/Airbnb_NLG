@@ -1,0 +1,79 @@
+(dp0
+S'east boston'
+p1
+S'quiet'
+p2
+sS'west end'
+p3
+S'trendy'
+p4
+sS'longwood medical area'
+p5
+g2
+sS'south boston'
+p6
+g4
+sS'mission hill'
+p7
+g2
+sS'south boston waterfront'
+p8
+g4
+sS'bay village'
+p9
+g4
+sS'dorchester'
+p10
+g2
+sS'mattapan'
+p11
+g2
+sS'downtown'
+p12
+g4
+sS'hyde park'
+p13
+g2
+sS'west roxbury'
+p14
+g2
+sS'beacon hill'
+p15
+g2
+sS'charlestown'
+p16
+g4
+sS'brighton'
+p17
+g2
+sS'allston'
+p18
+g2
+sS'roxbury'
+p19
+g2
+sS'leather district'
+p20
+g4
+sS'south end'
+p21
+g4
+sS'jamaica plain'
+p22
+g2
+sS'chinatown'
+p23
+g4
+sS'north end'
+p24
+g2
+sS'fenway'
+p25
+g4
+sS'back bay'
+p26
+g4
+sS'roslindale'
+p27
+g2
+s.

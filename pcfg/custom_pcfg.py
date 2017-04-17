@@ -5,6 +5,7 @@ import random
 import csv
 import query_locations as qry_locs
 from operator import itemgetter
+import query_trendy as qry_trendy
 
 # Minxing
 from size_desc import adj_size
@@ -74,7 +75,7 @@ def build_dict(row):
 	data_dict["a:property"] = "Modern"
 	data_dict["transport_hub"] = "Grand Central Station"
 	data_dict["attraction_type"] = "locations"
-	data_dict["a:neighbourhood"] = "Young"
+	data_dict["a:neighbourhood"] = qry_trendy.query_trendy(city, ngh)
 
 def parse_string(string):
 	regex = re.compile("\[([^\]]*)\]")
