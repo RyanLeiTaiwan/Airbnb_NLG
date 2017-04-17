@@ -8,7 +8,6 @@ def calDistance (line1, line2):
 	vector2 = np.fromstring(line2, dtype=float, sep=' ')
 	return dot(matutils.unitvec(vector1), matutils.unitvec(vector2))
 
-# two documents
 doc1 = sys.argv[1]
 
 with open(doc1) as f1:

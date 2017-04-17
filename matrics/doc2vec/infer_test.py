@@ -6,7 +6,7 @@ import sys
 #parameters
 model="model.bin"
 test_docs=sys.argv[1]
-output_file="test_vectors_pcfg.txt"
+output_file=sys.argv[2]
 
 #inference hyper-parameters
 start_alpha=0.01
