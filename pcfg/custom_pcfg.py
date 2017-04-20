@@ -43,15 +43,19 @@ def parse_data_file(data_file):
 		data_dict[key.strip()] = value.strip()
 """
 
+# Build all column information in a dictionary before running PCFG
+# Data mining (enrichment) goes here
 def build_dict(row):
 	global data_dict, data_dict_rand, api
 
 	data_dict = {}
 	data_dict_rand = {}
 
-	# Get the specific columns
-	# accommodates, bedrooms, bathrooms, square_feet, street, neighbourhood_cleansed, city,
-	# property_type, price, latitude, longitude
+	# Get specific column indices in CSV
+	"""
+	accommodates, bedrooms, bathrooms, square_feet, street, neighbourhood_cleansed, city,
+	property_type, price, latitude, longitude
+	"""
 	(accm, bath, bdrm, beds, sqft, street, ngh, city,
 	 property_type, price, lat, lng) \
 		= itemgetter(53, 54, 55, 56, 59, 37, 39, 41,
@@ -66,7 +70,7 @@ def build_dict(row):
 	data_dict["street_name"] = street.split(",")[0]
 	data_dict["property_type"] = property_type
 
-	# Temporary default values for things we cant generate yet...
+	### Temporary default values for things we cant generate yet...
 	data_dict["transportation"] = "[The L train]"
 	data_dict["distance_transport"] = "[A short walk]"
 	data_dict["a:property"] = "[Modern]"
@@ -102,7 +106,7 @@ def build_dict(row):
 		pass
 	else:
 		dic = pickle.load(picklefile)
-		# Build the attraction list every time (time-consuming)
+		# Build city-level attraction list each time (time-consuming)
 		for attr in dic.values():
 			city_attractions += attr
 	ngh_attractions_rand = []
@@ -261,7 +265,6 @@ def main():
 			elif counter > total_rows:
 				break
 
-			# random = True: Use random adjectives instead of mined adjectives
 			build_dict(row)
 			root.output(output_pcfg, output_random)
 			# Additional newlines
