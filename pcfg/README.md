@@ -16,10 +16,9 @@ Current implementation will only sample rows with non-NaN ['summary', 'accommoda
 Usage:
 <pre>custom_pcfg.py grammar_file csv_file #skip_rows #generate_rows [output_pcfg output_random]</pre>
 Example (Run all 100 rows):
-<pre>custom_pcfg.py grammar/updated_airbnb_grammar.txt sample/Boston_100.csv 0 100 result/20170417/pcfg_Boston_100.txt result/20170417/pcfg_Boston_100.txt</pre>
-Example (Skip the first 1000 rows and run only rows 1001 to 1003):
-<pre>custom_pcfg.py grammar/updated_airbnb_grammar.txt ../data/Boston_details.csv 1000 3 result/20170417/pcfg_Boston_3.txt result/20170417/pcfg_Boston_3.txt</pre>
-
+<pre>custom_pcfg.py grammar/updated_airbnb_grammar.txt sample/Boston_100.csv 0 100 result/20170417/pcfg_Boston_100.txt result/20170417/random_Boston_100.txt</pre>
+Example (Skip the first 1000 rows and run only rows 1001 to 1003, but don't output to files):
+<pre>custom_pcfg.py grammar/updated_airbnb_grammar.txt ../data/Boston_details.csv 1000 3</pre>
 - **#skip_rows**: number of first rows to skip (in addition to header). **#skip_rows = 0** if you want to start from the first property.
 - **#generate_rows**: number of rows to generate output.
 - (Optional) **output_pcfg**: output file of normal PCFG with mined information, one line per property.
@@ -31,3 +30,14 @@ Set a fixed Python random seed when we need reproducible results
 Standard output will always print the normal PCFG version with an additional newline after each property.
 
 Current implementation ensures the normal and random PCFG will choose the same grammar rules. Only the values of mined information are different.
+
+## Template-based method
+Usage:
+<pre>templated.py csv #skip_rows #generate_rows</pre>
+Example (Run all 100 rows):
+<pre>templated.py sample/Boston_100.csv 0 100 > result/20170417/template_100.txt</pre>
+- **#skip_rows**: number of first rows to skip (in addition to header). **#skip_rows = 0** if you want to start from the first property.
+- **#generate_rows**: number of rows to generate output.
+
+Result is shown in standard output.
+
