@@ -8,6 +8,7 @@ import pickle
 import query_locations as qry_locs
 from operator import itemgetter
 import query_trendy as qry_trendy
+import query_ngh_adjs as qry_ngh_adjs
 import numpy as np
 
 # Minxing
@@ -90,7 +91,10 @@ def build_dict(row):
 	data_dict["distance_attraction"] = google_api.distance_attractions(
 		api, lat, lng, city, ngh_attractions, max_walk=30)
 	# Adjective (trendy or quiet) for neighborhood
-	data_dict["a:neighbourhood"] = qry_trendy.query_trendy(city, ngh)
+	ngh_adj = qry_ngh_adjs.query_ngh_adjs(city, ngh)
+	if ngh_adj is None:
+		ngh_adj = qry_trendy.query_trendy(city, ngh)
+	data_dict["a:neighbourhood"] = ngh_adj
 
 	### Random versions of mined information
 	data_dict_rand["a:square_feet"] = random.choice(['spacious', 'cozy'])
