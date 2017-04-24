@@ -155,7 +155,11 @@ def walkscore(neighborhood):
 	reader = csv.reader(open("walkscore.csv", "rb"))
 	scores = {}
 	cur_scores = []
-	descrips = ["Very convenient to walk to nearby facilities and attractions, daily errands do not require a car.", "Transit is convenient for most trips, easy to get access to buses and rails.", "The neighborhood is flat as a pancake, and has excellent bike lanes."]
+	descrips = ["Very convenient to walk to nearby facilities and attractions, daily errands do not require a car.",
+	            "Transit is convenient for most trips, easy to get access to buses and rails.",
+	            "The neighborhood is flat as a pancake, and has excellent bike lanes."]
+	# Ryan: Return a single description with the best rank, or "" if worse than threshold
+	ranks = [0,0,0]
 
 	for line in reader:
 		scores[line[0].lower()] = (line[1], line[2], line[3])
@@ -170,10 +174,13 @@ def walkscore(neighborhood):
 		for s in scores:
 			if scores[s][i] > cur_scores[i]:
 				rank += 1
+				ranks[i] += 1
 		if rank > tot_neighs/3:
 			descrips[i] = ""
 	
-	print descrips
+	# print descrips
+	# The best-ranked description can be an empty string
+	return descrips[np.argmin(ranks)]
 	
 
 if __name__ == '__main__':

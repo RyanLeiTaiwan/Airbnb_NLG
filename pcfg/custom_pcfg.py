@@ -15,6 +15,7 @@ import numpy as np
 from size_desc import adj_size
 from pet_desc import adj_pets
 from price_desc import adj_price
+from transit_info import walkscore
 
 # Ryan
 import googlemaps # pip install googlemaps
@@ -90,11 +91,13 @@ def build_dict(row):
 	data_dict["neighbourhood_attractions"] = ", ".join(ngh_attractions)
 	data_dict["distance_attraction"] = google_api.distance_attractions(
 		api, lat, lng, city, ngh_attractions, max_walk=30)
-	# Adjective (trendy or quiet) for neighborhood
+	# Adjective for neighborhood
 	ngh_adj = qry_ngh_adjs.query_ngh_adjs(city, ngh)
 	if ngh_adj is None:
 		ngh_adj = qry_trendy.query_trendy(city, ngh)
 	data_dict["a:neighbourhood"] = ngh_adj
+	# Description for walkscore
+	data_dict["desc:walkscore"] = walkscore(ngh)
 
 	### Random versions of mined information
 	data_dict_rand["a:square_feet"] = random.choice(['spacious', 'cozy'])
@@ -123,6 +126,11 @@ def build_dict(row):
 	data_dict_rand["neighbourhood_attractions"] = ", ".join(ngh_attractions_rand)
 	data_dict_rand["distance_attraction"] = random.choice(['A short walk', 'A short drive'])
 	data_dict_rand["a:neighbourhood"] = random.choice(['trendy', 'quiet'])
+	walkscore_desc = \
+        ["Very convenient to walk to nearby facilities and attractions, daily errands do not require a car.",
+         "Transit is convenient for most trips, easy to get access to buses and rails.",
+         "The neighborhood is flat as a pancake, and has excellent bike lanes."]
+	data_dict_rand["desc:walkscore"] = random.choice(walkscore_desc)
 
 def parse_string(string):
 	regex = re.compile("\[([^\]]*)\]")
@@ -245,8 +253,8 @@ def build_tree(grammar_file):
 def main():
 	# Check command-line arguments
 	argc = len(sys.argv)
-	if argc != 5 and argc != 7:
-		print 'Usage: %s grammar csv #skip_rows #generate_rows [output_pcfg output_random]' % sys.argv[0]
+	if argc != 5 and argc != 6 and argc != 7:
+		print 'Usage: %s grammar csv #skip_rows #generate_rows [output_pcfg] [output_random]' % sys.argv[0]
 		exit(0)
 
 	root = build_tree(sys.argv[1])
@@ -256,8 +264,10 @@ def main():
 
 	output_pcfg = None
 	output_random = None
-	if argc == 7:
+	if argc >= 6:
 		output_pcfg = open(sys.argv[5], 'w')
+
+	if argc == 7:
 		output_random = open(sys.argv[6], 'w')
 
 	with open(sys.argv[2], "rb") as csvfile:
