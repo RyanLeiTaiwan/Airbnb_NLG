@@ -18,9 +18,9 @@ from price_desc import adj_price
 from transit_info import walkscore
 
 # Ryan
-import googlemaps # pip install googlemaps
+import googlemaps
 import google_api
-# Global Google API object
+# Ryan's Google API key
 apikey = 'AIzaSyDpC11dt2AcHTva0XhKhwC3J0kvVJIGdkM'
 api = googlemaps.Client(key=apikey)
 
@@ -127,9 +127,9 @@ def build_dict(row):
 	data_dict_rand["distance_attraction"] = random.choice(['A short walk', 'A short drive'])
 	data_dict_rand["a:neighbourhood"] = random.choice(['trendy', 'quiet'])
 	walkscore_desc = \
-        ["Very convenient to walk to nearby facilities and attractions, daily errands do not require a car.",
-         "Transit is convenient for most trips, easy to get access to buses and rails.",
-         "The neighborhood is flat as a pancake, and has excellent bike lanes."]
+        ["Very convenient to walk to nearby facilities and attractions, daily errands do not require a car",
+         "Transit is convenient for most trips, easy to get access to buses and rails",
+         "The neighborhood is flat as a pancake, and has excellent bike lanes"]
 	data_dict_rand["desc:walkscore"] = random.choice(walkscore_desc)
 
 def parse_string(string):
