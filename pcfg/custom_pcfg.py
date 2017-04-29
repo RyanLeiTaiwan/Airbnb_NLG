@@ -46,7 +46,7 @@ def parse_data_file(data_file):
 """
 
 # Build all column information in a dictionary before running PCFG
-# Data mining (enrichment) goes here
+# Data mining (feature enrichment) goes here
 def build_dict(row):
 	global data_dict, data_dict_rand, api
 
@@ -69,28 +69,28 @@ def build_dict(row):
 	data_dict["square_feet"] = sqft
 	data_dict["neighbourhood_cleansed"] = ngh
 	data_dict["city"] = city
-	data_dict["street_name"] = street.split(",")[0]
-	data_dict["property_type"] = property_type
+	data_dict["street"] = street.split(",")[0]
+	data_dict["property_type"] = property_type.lower()
 
 	### Temporary default values for things we cant generate yet...
 	data_dict["transportation"] = "[The L train]"
 	data_dict["distance_transport"] = "[A short walk]"
 	data_dict["a:property"] = "[Modern]"
 	data_dict["transport_hub"] = "[Grand Central Station]"
-	data_dict["attraction_type"] = "[locations]"
+	data_dict["attraction_type"] = "locations"
 
 	# Deep copy data_dict to data_dict_rand
 	data_dict_rand = copy.deepcopy(data_dict)
 
 	### Mined information
 	# Adjectives for square feet and price
-	data_dict["a:square_feet"] = adj_size(accm, bath, bdrm, beds)
+	data_dict["a:size"] = adj_size(accm, bath, bdrm, beds)
 	data_dict["a:price"] = adj_price(accm, price)
 	# Top 3 neighborhood attractions
 	ngh_attractions = qry_locs.query_locations(city, ngh)[:3]
 	data_dict["neighbourhood_attractions"] = ", ".join(ngh_attractions)
 	data_dict["distance_attraction"] = google_api.distance_attractions(
-		api, lat, lng, city, ngh_attractions, max_walk=30)
+		api, lat, lng, city, ngh_attractions, max_walk=30, max_drive=30)
 	# Adjective for neighborhood
 	ngh_adj = qry_ngh_adjs.query_ngh_adjs(city, ngh)
 	if ngh_adj is None:
@@ -100,7 +100,7 @@ def build_dict(row):
 	data_dict["desc:walkscore"] = walkscore(ngh)
 
 	### Random versions of mined information
-	data_dict_rand["a:square_feet"] = random.choice(['spacious', 'cozy'])
+	data_dict_rand["a:size"] = random.choice(['spacious', 'cozy'])
 	data_dict_rand["a:price"] = random.choice(['cheap', 'affordable', 'luxurious'])
 
 	# Instead of top 3 attractions in the correct neighborhood, choose 3 random city-level attractions
@@ -184,12 +184,19 @@ class tree_node:
 				else:
 					values.append("[" + key + "]")
 					values_rand.append("[" + key + "]")
-			# Print only the normal version on stdout
-			sys.stdout.write(self.text % tuple(values) + " ")
+
+			# Print only the normal PCFG version on stdout
+			output_str = self.text % tuple(values) + " "
+			output_rand_str = self.text % tuple(values_rand) + " "
+			# Capitalize only the first letter (str.capitalize() will lowercase other characters)
+			output_str = output_str[:1].upper() + output_str[1:]
+			output_rand_str = output_rand_str[:1].upper() + output_rand_str[1:]
+			sys.stdout.write(output_str)
+
 			# Write both the normal and random versions to files
 			try:
 				if output_pcfg:
-					output_pcfg.write(self.text % tuple(values) + " ")
+					output_pcfg.write(output_str)
 			except UnicodeEncodeError:
 				# TODO: Fix the unicode problem values
 				# print 'self.text: ' + str(self.text)
@@ -197,7 +204,7 @@ class tree_node:
 				pass
 			try:
 				if output_random:
-					output_random.write(self.text % tuple(values_rand) + " ")
+					output_random.write(output_rand_str)
 			except UnicodeEncodeError:
 				# TODO: Fix the unicode problem values
 				# print 'self.text: ' + str(self.text)

@@ -1,0 +1,53 @@
+S -> AD_BEGIN BODY AD_END
+
+BODY -> INTRO_ST_NG_CT ATT TRANS | INTRO_ST NG_CT ATT TRANS | INTRO_ST_NG_CT TRANS ATT | INTRO_ST NG_CT TRANS ATT
+
+INTRO_ST_NG_CT -> INTRO_ST_NG_CT_0 | INTRO_ST_NG_CT_1 | INTRO_ST_NG_CT_2 | INTRO_ST_NG_CT_3 | INTRO_ST_NG_CT_4
+
+INTRO_ST_NG_CT_0 -> "We have a [a:price] [property_type] with [a:size] [bedroom] bedrooms and [bathroom] bathrooms on [street] in the [a:neighbourhood] [neighbourhood_cleansed] of [city]."
+INTRO_ST_NG_CT_1 -> "Great [a:price] [property_type] on [street]. This [a:size] [bedroom]-bed/[bathroom]-bath [property_type] is located in the [a:neighbourhood] [neighbourhood_cleansed] of [city]."
+INTRO_ST_NG_CT_2 -> "[a:price] [property_type] on [street] to enjoy all [city] has to offer in the [a:neighbourhood] [neighbourhood_cleansed]. This [a:size] [property_type] has [bedroom] bedrooms and [bathroom] bathrooms."
+INTRO_ST_NG_CT_3 -> "[street] [a:size] and [a:price] [bedroom] BR / [bathroom] BA [property_type] available in [neighbourhood_cleansed], the [a:neighbourhood] neighborhood in [city]."
+INTRO_ST_NG_CT_4 -> "Experience [city] in our [a:size] [property_type] located in the [a:neighbourhood] [neighbourhood_cleansed] neighborhood. The [a:price] [property_type] on [street] has [bedroom] bedrooms and [bathroom] bathrooms."
+
+INTRO_ST -> INTRO_ST_0 | INTRO_ST_1 | INTRO_ST_2 | INTRO_ST_3 | INTRO_ST_4
+
+INTRO_ST_0 -> "This is a [a:price] [property_type] with [a:size] [bedroom] bedrooms and [bathroom] bathrooms on [street]."
+INTRO_ST_1 -> "Comfortable [apprise] and [a:size] [bedroom]-bed/[bathroom]-bath [property_type] on [street]."
+INTRO_ST_2 -> "[a:price] and [a:size] [bedroom] BR / [bathroom] BA [property_type] on [street] to enjoy your [city] trip."
+INTRO_ST_3 -> "[street] [a:size] and [a:price] [bedroom]-BR/[bathroom]-BA [property_type] available for rent."
+INTRO_ST_4 -> "Experience [city] in our [a:price] [property_type] with [a:size] [bedroom] bedrooms and [bathroom] bathrooms on [street]."
+
+NG_CT -> NG_CT_0 | NG_CT_1 | NG_CT_2 | NG_CT_3 | NG_CT_4
+
+NG_CT_0 -> "The [property_type] is located in [neighbourhood_cleansed], one of the most [a:neighbourhood] neighborhoods in [city]."
+NG_CT_1 -> "You can appreciate the [a:neighbourhood] part of [city] right in the [neighbourhood_cleansed] area."
+NG_CT_2 -> "[neighbourhood_cleansed] is known for being [a:neighbourhood] among the neighborhoods in [city]."
+NG_CT_3 -> "If you are seeking a [a:neighbourhood] neighborhood in [city], [neighbourhood_cleansed] is the right place for you."
+NG_CT_4 -> "[neighbourhood_cleansed] is considered a [a:neighbourhood] neighborhood in [city]."
+
+ATT -> ATT_0 | ATT_1 | ATT_2 | ATT_3 | ATT_4
+
+ATT_0 -> "Nearby locations include [neighbourhood_attractions], which are [distance_attraction] away."
+ATT_1 -> "The [property_type] is [distance_attraction] from [neighbourhood_attractions]."
+ATT_2 -> "You can visit [neighbourhood_attractions] in [distance_attraction]."
+ATT_3 -> "[neighbourhood_attractions] are in [distance_attraction]."
+ATT_4 -> "Within [distance_attraction], don't miss out on [neighbourhood_attractions]."
+
+TRANS -> "[desc:walkscore]."
+
+AD_BEGIN -> AD_BEGIN_0 | AD_BEGIN_1 | AD_BEGIN_2 | AD_BEGIN_3 | AD_BEGIN_4
+
+AD_BEGIN_0 -> ""
+AD_BEGIN_1 -> "Welcome to our [property_type]."
+AD_BEGIN_2 -> "This is the perfect place to stay."
+AD_BEGIN_3 -> "New to [city]? You've come to the right place."
+AD_BEGIN_4 -> "If you're looking for a place to stay in [city], then look no further."
+
+AD_END -> AD_END_0 | AD_END_1 | AD_END_2 | AD_END_3 | AD_END_4
+
+AD_END_0 -> ""
+AD_END_1 -> "We look forward to your stay in this [property_type]."
+AD_END_2 -> "You'll enjoy this lovely place."
+AD_END_3 -> "This [property_type] will be a great addition to your trip in [city]."
+AD_END_4 -> "Your stay here will be a pleasant experience."

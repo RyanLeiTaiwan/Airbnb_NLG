@@ -5,7 +5,7 @@ import googlemaps
 # lng: longitude
 # attactions: list of attractions
 # max_walk: maximum acceptable walking time in minutes
-def distance_attractions(api, lat, lng, city, attractions, max_walk):
+def distance_attractions(api, lat, lng, city, attractions, max_walk, max_drive):
 	# Empty attractions
 	if len(attractions) == 0:
 		return ''
@@ -29,13 +29,14 @@ def distance_attractions(api, lat, lng, city, attractions, max_walk):
 				min_time = minute
 			if minute > max_time:
 				max_time = minute
+
 		if max_time <= max_walk:
 			if min_time == max_time:
-				return 'A %d-minute walk' % max_time
+				return 'a %d-minute walk' % max_time
 			else:
-				return 'A %d-to-%d-minute walk' % (min_time, max_time)
+				return 'a %d-to-%d-minute walk' % (min_time, max_time)
 		else:
-			# It is too long to walk, return the driving time instead
+			# It is too long to walk. Return the driving time instead
 			min_time = float('+inf')
 			max_time = float('-inf')
 			dist_drive = api.distance_matrix(origins=origins, destinations=destinations, mode='driving')
@@ -45,12 +46,17 @@ def distance_attractions(api, lat, lng, city, attractions, max_walk):
 					min_time = minute
 				if minute > max_time:
 					max_time = minute
-			if min_time == max_time:
-				return 'A %d-minute drive' % max_time
+
+			if max_time <= max_drive:
+				if min_time == max_time:
+					return 'a %d-minute drive' % max_time
+				else:
+					return 'a %d-to-%d-minute drive' % (min_time, max_time)
 			else:
-				return 'A %d-to-%d-minute drive' % (min_time, max_time)
+				# It is too long to drive. Return an empty string
+				return ''
 	except:
-		return 'unknown distance'
+		return 'an unknown distance'
 
 if __name__ == '__main__':
 	apikey = 'AIzaSyDpC11dt2AcHTva0XhKhwC3J0kvVJIGdkM'
@@ -61,4 +67,4 @@ if __name__ == '__main__':
 	attractions = ['roslindale village', 'roslindale square', 'the arnold arboretum', 'emerald necklace']
 	# att = ['jp, the arnold arboretum, jamaica, jamaica pond']
 	# att = ['the museum of fine arts', 'longwood', 'northeastern university', 'penguin pizza']
-	print distance_attractions(api, lat, lng, city, attractions, max_walk=30)
+	print distance_attractions(api, lat, lng, city, attractions, max_walk=30, max_drive=30)

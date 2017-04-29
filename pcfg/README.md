@@ -35,7 +35,7 @@ Current implementation ensures the normal and random PCFG will choose the same g
 Usage:
 <pre>templated.py csv #skip_rows #generate_rows</pre>
 Example (Run all 100 rows):
-<pre>templated.py sample/Boston_100.csv 0 100 > result/20170417/template_100.txt</pre>
+<pre>templated.py sample/Boston_100.csv 0 100 > result/20170417/template_Boston_100.txt</pre>
 - **#skip_rows**: number of first rows to skip (in addition to header). **#skip_rows = 0** if you want to start from the first property.
 - **#generate_rows**: number of rows to generate output.
 
