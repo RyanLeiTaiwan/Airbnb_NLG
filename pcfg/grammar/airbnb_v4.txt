@@ -13,7 +13,7 @@ INTRO_ST_NG_CT_4 -> "Experience [city] in our [a:size] [property_type] located i
 INTRO_ST -> INTRO_ST_0 | INTRO_ST_1 | INTRO_ST_2 | INTRO_ST_3 | INTRO_ST_4
 
 INTRO_ST_0 -> "This is a [a:price] [property_type] with [a:size] [bedroom] bedrooms and [bathroom] bathrooms on [street]."
-INTRO_ST_1 -> "Comfortable [apprise] and [a:size] [bedroom]-bed/[bathroom]-bath [property_type] on [street]."
+INTRO_ST_1 -> "Comfortable [a:price] and [a:size] [bedroom]-bed/[bathroom]-bath [property_type] on [street]."
 INTRO_ST_2 -> "[a:price] and [a:size] [bedroom] BR / [bathroom] BA [property_type] on [street] to enjoy your [city] trip."
 INTRO_ST_3 -> "[street] [a:size] and [a:price] [bedroom]-BR/[bathroom]-BA [property_type] available for rent."
 INTRO_ST_4 -> "Experience [city] in our [a:price] [property_type] with [a:size] [bedroom] bedrooms and [bathroom] bathrooms on [street]."

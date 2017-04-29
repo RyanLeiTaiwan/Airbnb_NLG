@@ -90,7 +90,7 @@ def build_dict(row):
 	ngh_attractions = qry_locs.query_locations(city, ngh)[:3]
 	data_dict["neighbourhood_attractions"] = ", ".join(ngh_attractions)
 	data_dict["distance_attraction"] = google_api.distance_attractions(
-		api, lat, lng, city, ngh_attractions, max_walk=30, max_drive=30)
+		api, lat, lng, city, ngh_attractions, max_walk=20, max_drive=20)
 	# Adjective for neighborhood
 	ngh_adj = qry_ngh_adjs.query_ngh_adjs(city, ngh)
 	if ngh_adj is None:
