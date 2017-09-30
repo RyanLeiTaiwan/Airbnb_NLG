@@ -1,14 +1,9 @@
-transit
 street
 neighbourhood
 neighbourhood_cleansed
-neighbourhood_group_cleansed
 city
 state
 zipcode
-market
-smart_location
-country_code
 country
 latitude
 longitude
