@@ -1,0 +1,44 @@
+Amsterdam, North Holland, The Netherlands
+Antwerp, Flemish Region, Belgium
+Asheville, North Carolina, United States
+Athens, Attica, Greece
+Austin, Texas, United States
+Barcelona, Catalonia, Spain
+Berlin, Berlin, Germany
+Boston, Massachusetts, United States
+Brussels, Brussels, Belgium
+Chicago, Illinois, United States
+Copenhagen, Hovedstaden, Denmark
+Denver, Colorado, United States
+Dublin, Leinster, Ireland
+Edinburgh, Scotland, United Kingdom
+Geneva, Geneva, Switzerland
+Hong Kong, Hong Kong, China
+London, England, United Kingdom
+Los Angeles, California, United States
+Madrid, Comunidad de Madrid, Spain
+Mallorca, Islas Baleares, Spain
+Manchester, England, United Kingdom
+Melbourne, Victoria, Australia
+Montreal, Quebec, Canada
+Nashville, Tennessee, United States
+New Orleans, Louisiana, United States
+New York City, New York, United States
+Northern Rivers, New South Wales, Australia
+Oakland, California, United States
+Paris, Île-de-France, France
+Portland, Oregon, United States
+Quebec City, Quebec, Canada
+Rome, Lazio, Italy
+San Diego, California, United States
+San Francisco, California, United States
+Santa Cruz County, California, United States
+Seattle, Washington, United States
+Sydney, New South Wales, Australia
+Toronto, Ontario, Canada
+Trentino, Trentino-Alto Adige/Südtirol, Italy
+Vancouver, British Columbia, Canada
+Venice, Veneto, Italy
+Victoria, British Columbia, Canada
+Vienna, Vienna, Austria
+Washington, D.C., District of Columbia, United States
