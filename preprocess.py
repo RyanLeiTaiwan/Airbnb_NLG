@@ -1,18 +1,24 @@
 import pandas as pd
-import numpy as np
-import sys, os
+import sys
+import os
 import argparse
-import string, re
+import string
+import re
 import json
 from langdetect import detect
 from collections import OrderedDict
+from process_by_topics import process_by_space
 
 # Convert list to set for O(1) search time
 punc = set(string.punctuation)
 # In Airbnb CSV format, complete (untruncated) description
 #   = summary + space + access + interaction + neighborhood_overview + transit + notes
 desc_cols = ['summary', 'space', 'access', 'interaction', 'neighborhood_overview', 'transit', 'notes']
+# Columns with string dtype
 str_cols = desc_cols + []
+# Topics covered
+topics = ['all_topics', 'space']
+
 
 def incr(dic, key):
     if key in dic:
@@ -67,15 +73,70 @@ def complete_description(row):
             build_string.append(getattr(row, col))
     return ' '.join(build_string)
 
+# Entry point of processing by different topics.
+# fp_data_list, fp_desc_list: list of file pointers
+# row: a Pandas row using iterator
+# description: complete description by concatenation
+# This will call all other process_by_XXX() functions
+def process_by_topics(fp_data_list, fp_desc_list, row, description):
+    assert len(fp_data_list) == len(fp_desc_list)
+    process_by_all(fp_data_list[0], fp_desc_list[0], row, description)
+    process_by_space(fp_data_list[1], fp_desc_list[1], row, description)
+
+# TODO: Not the new focus, should be used only for word count / vocab building in the future
+# Process by all topics
+def process_by_all(fp_data, fp_desc, row, description):
+    # data_output: list of " , " separated strings
+    data_output = []
+    # desc_output: list of " " separated strings
+    desc_output = []
+
+    # data_output[] will be meaningless if we don't have corresponding description
+    if len(description) > 0:
+        for word in description.split():
+            handle_word(desc_output, word.lower())
+        # Final description string
+        desc_str = " ".join(desc_output)
+        fp_desc.write(re.sub("\s+", " ", desc_str) + '\n')
+
+        for label in header_cols:
+            label_val = row[label]
+            if len(label_val) > 0:
+                if label == 'street':
+                    # Get only the first part of the full address
+                    info = label_val.split(',')[0]
+                elif label == 'amenities':
+                    info = handle_amenities(label_val.replace('\n', ''))
+                else:
+                    info = label_val.replace('\n', '')
+                # TODO: by-topic processing won't need this
+                incr(vocabulary, label)
+                data_output.append(label)
+                build_string = []
+                for word in info.split():
+                    handle_word(build_string, word.lower())
+                data_output.append(" ".join(build_string))
+        fp_data.write(" , ".join(data_output) + '\n')
+
+
 def process(args, file_name, header_cols):
     # Unpack command-line arguments
-    city_dir, output_dir, vocab_flag = args.csv_path, args.output_path, args.vocab
+    csv_dir, output_dir, vocab_flag = args.csv_path, args.output_path, args.vocab
     global vocabulary, line_errs
-    new_file = file_name.split('.')[0]
-    data_file = open(os.path.join(output_dir, new_file + '.data'), 'w')
-    desc_file = open(os.path.join(output_dir, new_file + '.desc'), 'w')
-    # Treat every column as string for now
-    df = pd.read_csv(os.path.join(city_dir, fil), header=0, dtype=np.str)
+    city_name = file_name.split('.')[0]
+    # File open all in one place (two lists of file pointers)
+    fp_data_list = []
+    fp_desc_list = []
+    for topic in topics:
+        # Create output subdirectory if it does not exist
+        output_subdir = os.path.join(output_dir, topic)
+        if not os.path.exists(output_subdir):
+            os.makedirs(output_subdir)
+        fp_data_list.append(open(os.path.join(output_subdir, city_name + '.data'), 'w'))
+        fp_desc_list.append(open(os.path.join(output_subdir, city_name + '.desc'), 'w'))
+
+    # Pandas CSV read. For now, treat every column as string
+    df = pd.read_csv(os.path.join(csv_dir, file_name), header=0, dtype=str)
     # Fill NaN's with '' in string columns
     for col in desc_cols + header_cols:
         if hasattr(df, col):
@@ -84,48 +145,24 @@ def process(args, file_name, header_cols):
     # Use Panda's row iterator instead accessing by index
     # https://stackoverflow.com/questions/16476924/how-to-iterate-over-rows-in-a-dataframe-in-pandas
     for _, row in df.iterrows():
-        # data_output: list of " , " separated strings
-        data_output = []
-        # desc_output: list of " " separated strings
-        desc_output = []
         description = complete_description(row)
         # print description
         try:
-            # Skip descriptions of < 5 characters
-            if len(description) > 5:
+            # Skip descriptions of < 20 characters
+            if len(description) >= 20:
                 # Detecting language takes more than 30x more time!!
                 # We can temporarily turn this off when developing other functionalities
                 # if True:
                 if detect((row['summary'])) == 'en':
                 # if detect(description) == 'en':
-                    if len(description) > 0:
-                        for word in description.split():
-                            handle_word(desc_output, word.lower())
-                    for label in header_cols:
-                        label_val = row[label]
-                        if len(label_val) > 0:
-                            if label == 'street':
-                                # Get only the first part of the full address
-                                info = label_val.split(',')[0]
-                            elif label == 'amenities':
-                                info = handle_amenities(label_val.replace('\n', ''))
-                            else:
-                                info = label_val.replace('\n', '')
-                            # TODO: by_topic processing won't need this
-                            incr(vocabulary, label)
-                            data_output.append(label)
-                            build_string = []
-                            for word in info.split():
-                                handle_word(build_string, word.lower())
-                            data_output.append(" ".join(build_string))
-                    data_file.write(" , ".join(data_output) + '\n')
-                    description = " ".join(desc_output)
-                    desc_file.write(re.sub("\s+"," ",description) + '\n')
+                    process_by_topics(fp_data_list, fp_desc_list, row, description)
+        # TODO: Trace exception cases to reduce possibility of reaching this block of code
         except:
             line_errs += 1
-    data_file.close()
-    desc_file.close()
-    print "Finished file: " + file_name
+    # File open all in one place
+    for fp in fp_data_list + fp_desc_list:
+        fp.close()
+    print "Finished CSV file: " + file_name
 
 def build_parser():
     parser = argparse.ArgumentParser(description='Preprocess Airbnb CSV files.')
@@ -184,10 +221,10 @@ if __name__ == '__main__':
         os.makedirs(args.output_path)
 
     # For each city (csv file) in csv_path
-    for fil in os.listdir(args.csv_path):
-        if fil == '.DS_Store':
+    for file_name in os.listdir(args.csv_path):
+        if file_name == '.DS_Store':
             continue
-        process(args, fil, header_cols)
+        process(args, file_name, header_cols)
 
     # If we are to build a new vocab file
     if args.vocab:
