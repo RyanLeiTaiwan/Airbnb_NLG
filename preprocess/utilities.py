@@ -1,7 +1,7 @@
 """
 Shared utility functions
 """
-from preprocess_const import *
+from const import *
 
 
 def incr(dic, key):
