@@ -1,23 +1,18 @@
 # Import our own modules
-from const import *
-from utilities import *
-from handle_columns import *
 from process_by_topics import *
-
 # Import built-in or 3rd-party modules
 import pandas as pd
 import sys
 import os
 import argparse
-import re
 import json
 from langdetect import detect
 from collections import OrderedDict
 
-def process(args, file_name, header_cols):
+def process(args, file_name, header_cols, vocab):
     # Unpack command-line arguments
     csv_dir, output_dir, vocab_flag = args.csv_path, args.output_path, args.vocab
-    global vocabulary, line_errs
+    global line_errs
     city_name = file_name.split('.')[0]
 
     # File open all in one place (three lists of file pointers)
@@ -53,7 +48,7 @@ def process(args, file_name, header_cols):
                 # if True:
                 if detect((row['summary'])) == 'en':
                 # if detect(description) == 'en':
-                    process_by_topics(fp_data_list, fp_desc_list, fp_rank_list, row, description)
+                    process_by_topics(fp_data_list, fp_desc_list, fp_rank_list, row, header_cols, description, vocab)
         # TODO: Trace exception cases to reduce possibility of reaching this block of code
         except:
             line_errs += 1
@@ -61,56 +56,6 @@ def process(args, file_name, header_cols):
     for fp in fp_data_list + fp_desc_list:
         fp.close()
     print "Finished CSV file: " + file_name
-
-# Entry point of processing by different topics.
-# fp_data_list, fp_desc_list, fp_rank_list: lists of file pointers
-# row: a Pandas row using iterator
-# description: complete description by concatenation
-# This will call all other process_by_XXX() functions
-def process_by_topics(fp_data_list, fp_desc_list, fp_rank_list, row, description):
-    assert len(fp_data_list) == len(fp_desc_list)
-    process_by_all((fp_data_list[0], fp_desc_list[0], fp_rank_list[0]), row, description)
-    process_by_space((fp_data_list[1], fp_desc_list[1], fp_rank_list[1]), row, description)
-
-
-# TODO: Not the new focus, should be used only for word count / vocab building in the future
-# Process by all topics
-def process_by_all(fp_list, row, description):
-    # Unpack file pointer tuple
-    (fp_data, fp_desc, _) = fp_list
-
-
-    # data_output: list of " , " separated strings
-    data_output = []
-    # desc_output: list of " " separated strings
-    desc_output = []
-
-    # data_output[] will be meaningless if we don't have corresponding description
-    if len(description) > 0:
-        for word in description.split():
-            handle_word(desc_output, vocabulary, word.lower())
-        # Final description string
-        desc_str = " ".join(desc_output)
-        fp_desc.write(re.sub("\s+", " ", desc_str) + '\n')
-
-        for label in header_cols:
-            label_val = row[label]
-            if len(label_val) > 0:
-                if label == 'street':
-                    # Get only the first part of the full address
-                    info = label_val.split(',')[0]
-                elif label == 'amenities':
-                    info = handle_amenities(label_val.replace('\n', ''))
-                else:
-                    info = label_val.replace('\n', '')
-                # TODO: by-topic processing won't need this
-                incr(vocabulary, label)
-                data_output.append(label)
-                build_string = []
-                for word in info.split():
-                    handle_word(build_string, vocabulary, word.lower())
-                data_output.append(" ".join(build_string))
-        fp_data.write(" , ".join(data_output) + '\n')
 
 
 def build_parser():
@@ -162,7 +107,6 @@ if __name__ == '__main__':
     parser = build_parser()
     args = parser.parse_args()
 
-    global vocabulary, line_errs
     vocabulary = {}
     line_errs = 0
     header_cols = get_cols(args.column_path)
@@ -175,7 +119,7 @@ if __name__ == '__main__':
     for file_name in os.listdir(args.csv_path):
         if file_name == '.DS_Store':
             continue
-        process(args, file_name, header_cols)
+        process(args, file_name, header_cols, vocabulary)
 
     # If we are to build a new vocab file
     vocab_count = 0
