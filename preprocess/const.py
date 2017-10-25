@@ -11,5 +11,5 @@ desc_cols = ['summary', 'space', 'access', 'interaction', 'neighborhood_overview
 # Columns with string dtype
 str_cols = desc_cols + []
 # Topics covered
-topics = ['all_topics', 'space']
+topics = ['all_topics', 'space', 'nearby']
 
