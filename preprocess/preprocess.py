@@ -66,7 +66,7 @@ def process(args, file_name, header_cols, vocab):
                     # TODO: [Refactor] Call NLTK segmentation/lemmatization here instead of in each topic processing
                     process_by_all((fp_data_list[0], fp_desc_list[0], fp_rank_list[0]), row, header_cols, description,
                                     vocab)
-                    process_by_topics(fp_data_list, fp_desc_list, fp_rank_list, row, header_cols, description, stats)
+                    process_by_topics(fp_data_list, fp_desc_list, fp_rank_list, row, description, stats)
                 else:
                     stats.skip_rows += 1
                     Stats.total_skip_rows += 1
@@ -141,13 +141,12 @@ def process_by_all(fp_list, row, header_cols, description, vocab):
 """ Entry point of processing by different topics. """
 # fp_data_list, fp_desc_list, fp_rank_list: lists of file pointers
 # row: a Pandas row using iterator
-# header_cols: list of pre-defined CSV column names we will ever use
 # description: complete description by concatenation
 # vocab: vocabulary word count dictionary to be built
 # This will call all other topics_by_XXX() functions
-def process_by_topics(fp_data_list, fp_desc_list, fp_rank_list, row, header_cols, description, stats):
+def process_by_topics(fp_data_list, fp_desc_list, fp_rank_list, row, description, stats):
     assert len(fp_data_list) == len(fp_desc_list) == len(fp_rank_list)
-    topics_by_keywords((fp_data_list, fp_desc_list, fp_rank_list), row, header_cols, description, stats)
+    topics_by_keywords((fp_data_list, fp_desc_list, fp_rank_list), row, description, stats)
 
 
 def build_parser():
