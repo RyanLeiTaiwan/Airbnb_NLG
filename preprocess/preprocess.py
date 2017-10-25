@@ -8,9 +8,10 @@ import sys
 import os
 import argparse
 import json
+from collections import OrderedDict
 from langdetect import detect, DetectorFactory
 from langdetect.lang_detect_exception import LangDetectException
-from collections import OrderedDict
+from nltk import word_tokenize
 
 # To enforce consistent language detection results
 # https://github.com/Mimino666/langdetect
@@ -20,7 +21,8 @@ def process(args, file_name, header_cols, vocab):
     print 'Processing %s...' % file_name
     # Unpack command-line arguments
     csv_dir, output_dir, vocab_flag = args.csv_path, args.output_path, args.vocab
-    global total_nrows, total_line_errs
+    global total_nrows, total_line_skips, total_line_errs
+    line_skips = 0
     line_errs = 0
     city_name = file_name.split('.')[0]
 
@@ -50,11 +52,11 @@ def process(args, file_name, header_cols, vocab):
     for idx, row in df.iterrows():
         if (idx + 1) % 1000 == 0:
             # Print some progress for large files
-            print '  Row %d' % (idx + 1)
+            print '  %d rows' % (idx + 1)
         description = complete_description(row)
         # print description
-        # Skip descriptions of < 20 characters
-        if description is not None and len(description) >= 20:
+        # Skip descriptions of too few characters
+        if description is not None and len(description) >= MIN_DESC_CHARS:
             try:
                 # 1. langdetect requires first decoding into Unicode
                 # 2. Detecting language takes at least 30x more time!!
@@ -62,24 +64,35 @@ def process(args, file_name, header_cols, vocab):
                 #    in the formal run. Detecting summary sometimes leads to LangDetectException('CantDetectError')
                 if detect(description.decode('utf8')) == 'en':
                 # if True:
+                    # TODO: [Refactor] Call NLTK segmentation/lemmatization here instead of in each topic processing
                     process_by_all((fp_data_list[0], fp_desc_list[0], fp_rank_list[0]), row, header_cols, description,
                                     vocab)
                     process_by_topics(fp_data_list, fp_desc_list, fp_rank_list, row, header_cols, description, vocab)
-            # TODO: Trace exception cases to reduce possibility of reaching this block of code
+                else:
+                    line_skips += 1
+                    total_line_skips += 1
             except LangDetectException as e:
                 err = 'LangDetectException (error code: %d)' % e.get_code()
                 print err
                 line_errs += 1
                 total_line_errs += 1
+            except UnicodeDecodeError:
+                print 'UnicodeDecodeError'
+                line_errs += 1
+                total_line_errs += 1
             except:
                 line_errs += 1
                 total_line_errs += 1
+        else:
+            line_skips += 1
+            total_line_skips += 1
     # File open all in one place
     for fp in fp_data_list + fp_desc_list + fp_rank_list:
         fp.close()
     total_nrows += nrows
-    print 'Finished CSV file %s with %.1f%% (%d / %d) error lines' % \
-          (file_name, float(line_errs) / float(nrows) * 100.0, line_errs, nrows)
+    print 'Finished CSV file %s with %.1f%% (%d / %d) skipped lines, %.1f%% (%d / %d) error lines' % \
+          (file_name, float(line_skips) / float(nrows) * 100.0, line_skips, nrows,
+           float(line_errs) / float(nrows) * 100.0, line_errs, nrows)
 
 
 # TODO: Not the new focus, should be used only for word count / vocab building in the future
@@ -88,36 +101,34 @@ def process_by_all(fp_list, row, header_cols, description, vocab):
     # Unpack file pointer tuple
     (fp_data, fp_desc, _) = fp_list
 
+    # Note: NLTK segmentation requires first decoding into Unicode. http://www.nltk.org/api/nltk.tokenize.html
+    desc_output = word_tokenize(description.decode('utf8'))
+    for word in desc_output:
+        incr(vocab, word.lower())
+    desc_str = ' '.join(desc_output)
+    # Encode Unicode back to Python string for file writing
+    fp_desc.write(re.sub('\s+', ' ', desc_str).encode('utf8') + '\n')
+
     # data_output: list of " , " separated strings
     data_output = []
-    # desc_output: list of " " separated strings
-    desc_output = []
-
-    # data_output[] will be meaningless if we don't have corresponding description
-    if len(description) > 0:
-        for word in description.split():
-            handle_word(desc_output, vocab, word.lower())
-        # Final description string
-        desc_str = " ".join(desc_output)
-        fp_desc.write(re.sub("\s+", " ", desc_str) + '\n')
-
-        for label in header_cols:
-            label_val = row[label]
-            if len(label_val) > 0:
-                if label == 'street':
-                    # Get only the first part of the full address
-                    info = label_val.split(',')[0]
-                elif label == 'amenities':
-                    info = handle_amenities(label_val.replace('\n', ''))
-                else:
-                    info = label_val.replace('\n', '')
-                incr(vocab, label)
-                data_output.append(label)
-                build_string = []
-                for word in info.split():
-                    handle_word(build_string, vocab, word.lower())
-                data_output.append(" ".join(build_string))
-        fp_data.write(" , ".join(data_output) + '\n')
+    for label in header_cols:
+        label_val = row[label]
+        if len(label_val) > 0:
+            if label == 'street':
+                # Get only the first part of the full address
+                info = label_val.replace('\n', '').split(',')[0]
+            elif label == 'amenities':
+                info = handle_amenities(label_val.replace('\n', ''))
+            else:
+                info = label_val.replace('\n', '')
+            incr(vocab, label)
+            data_output.append(label)
+            build_string = word_tokenize(info.decode('utf8'))
+            for word in build_string:
+                incr(vocab, word.lower())
+            data_output.append(' '.join(build_string))
+    # Encode Unicode back to Python string for file writing
+    fp_data.write(' , '.join(data_output).encode('utf8') + '\n')
 
 
 """ Entry point of processing by different topics. """
@@ -183,8 +194,8 @@ if __name__ == '__main__':
 
     vocabulary = {}
     total_nrows = 0
+    total_line_skips = 0
     total_line_errs = 0
-    # TODO total_line_skips because of non-error reasons
     header_cols = get_cols(args.column_path)
 
     # Create output directory if it does not exist
@@ -204,16 +215,17 @@ if __name__ == '__main__':
         for x in sorted(vocabulary.keys()):
             if vocabulary[x] >= args.min_freq:
                 vocab_count += 1
-                v_file.write(x + '\n')
+                v_file.write(x.encode('utf8') + '\n')
         v_file.close()
 
         # Sort by value to dump the whole word count
         wc_file = open('word_count.json', 'w')
         wc = OrderedDict(sorted(vocabulary.items(), key=lambda t: t[1], reverse=True))
-        wc_file.write(json.dumps(wc, indent=4) + '\n')
+        wc_file.write(json.dumps(wc, indent=4, ensure_ascii=False).encode('utf8') + '\n')
         wc_file.close()
 
-    print '\nFinished all CSVs with %.1f%% (%d / %d) error lines.' % \
-          (float(total_line_errs) / float(total_nrows) * 100.0, total_line_errs, total_nrows)
+    print '--\nFinished all CSVs with %.1f%% (%d / %d) skipped lines, %.1f%% (%d / %d) error lines' % \
+          (float(total_line_skips) / float(total_nrows) * 100.0, total_line_skips, total_nrows,
+           float(total_line_errs) / float(total_nrows) * 100.0, total_line_errs, total_nrows)
     print 'Complete vocab size: %d, where %d words appear at least %d times' % \
           (len(vocabulary), vocab_count, args.min_freq)

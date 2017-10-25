@@ -7,8 +7,6 @@ from nltk.stem import WordNetLemmatizer
 import numpy as np
 import json
 
-
-# TODO: Put hard-coded paths in preprocess_const
 json_file = open('topic_keywords.json', 'r')
 keywords = json.load(json_file)['space']
 wordnet = WordNetLemmatizer()

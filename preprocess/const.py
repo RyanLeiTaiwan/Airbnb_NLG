@@ -12,4 +12,5 @@ desc_cols = ['summary', 'space', 'access', 'interaction', 'neighborhood_overview
 str_cols = desc_cols + []
 # Topics covered
 topics = ['all_topics', 'space', 'nearby']
-
+# Minimum number of characters in description. Otherwise, skip the property
+MIN_DESC_CHARS = 50
