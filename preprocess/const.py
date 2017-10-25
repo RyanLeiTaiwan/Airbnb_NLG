@@ -5,6 +5,7 @@ import string
 
 # Convert punctuation list to set for O(1) search time
 punc = set(string.punctuation)
+
 # In Airbnb CSV format, complete (untruncated) description
 #   = summary + space + access + interaction + neighborhood_overview + transit + notes
 desc_cols = ['summary', 'space', 'access', 'interaction', 'neighborhood_overview', 'transit', 'notes']
@@ -13,4 +14,6 @@ str_cols = desc_cols + []
 # Topics covered
 topics = ['all_topics', 'space', 'nearby']
 # Minimum number of characters in description. Otherwise, skip the property
-MIN_DESC_CHARS = 50
+MIN_DESC_CHARS = 20
+# Minimum keyword ranking score for the best sentence. Otherwise, skip the property
+MIN_KEYWORD_SCORE = 1

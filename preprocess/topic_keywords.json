@@ -14,7 +14,6 @@
         "hotel": 1,
         "suite": 1,
         "bed": 1,
-        "beds": 1,
         "breakfast": 1,
         "dorm": 1,
         "cottage": 1,
@@ -24,13 +23,10 @@
         "mixed": 1,
         "family": 1,
         "room": 1,
-        "rooms": 1,
         "bedroom": 1,
-        "bedrooms": 1,
         "br": 1,
         "bd": 1,
         "bathroom": 1,
-        "bathrooms": 1,
         "ba": 1,
         "bath": 1,
         "spacious": 1,
@@ -43,5 +39,14 @@
         "sized": 1,
         "acre": 1,
         "sqft": 1
+    },
+    "nearby": {
+        "nearby": 1,
+        "restaurant": 1,
+        "cafe": 1,
+        "café": 1,
+        "cafés": 1,
+        "bar": 1,
+        "shopping": 1
     }
 }

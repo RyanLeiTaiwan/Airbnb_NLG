@@ -1,6 +1,9 @@
 import argparse
 import os
 import pandas as pd
+# from langdetect import detect, DetectorFactory
+# from langdetect.lang_detect_exception import LangDetectException
+# TODO: [Refactor] Call langdetect here so the efficiency bottleneck can be done once and for all
 
 # Random seed to make the split reproducible
 seed = 11632
