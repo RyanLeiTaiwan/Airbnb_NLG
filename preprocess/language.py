@@ -16,7 +16,8 @@ def process(in_dir, file_name, out_dir):
     df = pd.read_csv(os.path.join(in_dir, file_name), header=0)
     nrows = df.shape[0]
 
-    seen = set()
+    seen_summary = set()
+    seen_space = set()
     len_errs = 0
     lang_errs = 0
     dup_errs = 0
@@ -27,17 +28,25 @@ def process(in_dir, file_name, out_dir):
 
     for idx, row in df.iterrows():
         try:
+            summary = row['summary']
+            space = row['space']
+            ngh = row['neighborhood_overview']
             description = row['description']
             if description is not np.nan and len(description) > 20:
-                # TODO: Decide whether to use description instead of summary and how to handle NaN's
-                if row['summary'] is not np.nan and row['summary'] not in seen:
-                    seen.add(row['summary'])
+                # Airbnb users almost always fill in either of summary and space
+                if (summary is np.nan or summary not in seen_summary) and (space is np.nan or space not in seen_space):
+                    if summary is not np.nan:
+                        seen_summary.add(summary)
+                    if space is not np.nan:
+                        seen_space.add(space)
+
+                    # Detect language on description (very slow)
                     if detect(description.decode('utf8')) == 'en':
                         keeps.append(idx)
                     else:
                         lang_errs += 1
                 else:
-                    # print 'Duplicate, ' + str(row['id']) + ': ' + str(row['summary'])
+                    # print 'Duplicate, ' + str(row['id']) + ': ' + str(description)
                     # print
                     dup_errs += 1
             else:
