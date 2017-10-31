@@ -9,11 +9,19 @@ from langdetect import detect, DetectorFactory
 # https://github.com/Mimino666/langdetect
 DetectorFactory.seed = 0
 
+# Explicitly specify some dtypes to avoid DtypeWarning in pd.csv_read()
+dtype = {
+    'jurisdiction_names': str,
+    'zipcode': str,
+    'license': str,
+    'neighbourhood': str
+}
+
 
 def process(in_dir, file_name, out_dir):
     new_file = file_name.split('.')[0]
     en_file = open(os.path.join(out_dir, new_file + '.en'), 'w')
-    df = pd.read_csv(os.path.join(in_dir, file_name), header=0)
+    df = pd.read_csv(os.path.join(in_dir, file_name), header=0, dtype=dtype)
     nrows = df.shape[0]
 
     seen_summary = set()
@@ -30,7 +38,6 @@ def process(in_dir, file_name, out_dir):
         try:
             summary = row['summary']
             space = row['space']
-            ngh = row['neighborhood_overview']
             description = row['description']
             if description is not np.nan and len(description) > 20:
                 # Airbnb users almost always fill in either of summary and space
@@ -55,6 +62,10 @@ def process(in_dir, file_name, out_dir):
             # print 'Other error, ' + str(row['id']) + ': ' + str(description)
             # print
             other_errs += 1
+
+        # Print some progress for large files
+        if (idx + 1) % 1000 == 0:
+            print '  %d rows' % (idx + 1)
 
     total_errs = lang_errs + dup_errs + len_errs + other_errs
     (df.iloc[keeps]).to_csv(en_file, index=False)
@@ -99,6 +110,7 @@ if __name__ == '__main__':
 
     for fil in os.listdir(args.input_dir):
         if fil.endswith('.csv'):
+            print 'Processing %s...' % fil
             (err, nr) = process(args.input_dir, fil, args.output_dir)
             errors += err
             nrows += nr
