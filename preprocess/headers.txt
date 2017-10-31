@@ -1,6 +1,6 @@
 id
 name
-desciption
+description
 summary
 space
 access
