@@ -20,7 +20,7 @@ dtype = {
 
 def process(in_dir, file_name, out_dir):
     new_file = file_name.split('.')[0]
-    en_file = open(os.path.join(out_dir, new_file + '.en'), 'w')
+    out_file = os.path.join(out_dir, new_file + '.csv')
     df = pd.read_csv(os.path.join(in_dir, file_name), header=0, dtype=dtype)
     nrows = df.shape[0]
 
@@ -68,8 +68,10 @@ def process(in_dir, file_name, out_dir):
             print '  %d rows' % (idx + 1)
 
     total_errs = lang_errs + dup_errs + len_errs + other_errs
-    (df.iloc[keeps]).to_csv(en_file, index=False)
-    en_file.close()
+    df_keep = df.iloc[keeps]
+    total_keeps = df_keep.shape[0]
+    df_keep.to_csv(out_file, index=False)
+    assert nrows == total_keeps + total_errs
 
     print 'Finished file: ' + file_name
     print '  Language Errors: %d (%.1f%%)' % (lang_errs, float(lang_errs) / float(nrows) * 100.0)
@@ -77,22 +79,30 @@ def process(in_dir, file_name, out_dir):
     print '  Length Errors: %d (%.1f%%)' % (len_errs, float(len_errs) / float(nrows) * 100.0)
     print '  Other Errors: %d (%.1f%%)' % (other_errs, float(other_errs) / float(nrows) * 100.0)
     print '  Total Errors: %d (%.1f%%)' % (total_errs, float(total_errs) / float(nrows) * 100.0)
-    print '  Total Rows: %d' % nrows
+    print '  Remaining Rows: %d (%.1f%%) out of %d' % (total_keeps, float(total_keeps) / float(nrows) * 100.0, nrows)
+
+    # Read back CSV to verify row sizes match. The '\r' bug will fail this assertion
+    total_keeps_read = pd.read_csv(out_file).shape[0]
+    print '  Verified Remaining Rows: %d' % total_keeps_read
     print
+    assert total_keeps == total_keeps_read
     return (total_errs, nrows)
 
 
 def build_parser():
-    parser = argparse.ArgumentParser(description='Preprocess AirBnB CSV files.')
+    parser = argparse.ArgumentParser(
+        description='Pre-processing step 1: Filter rows by (language, duplicate, length) detection.' +
+        ''
+    )
     parser.add_argument(
         '-i', '--input_dir',
-        default='.',
-        help='The path to the input directory. Default: current directory.'
+        required=True,
+        help='The path to the input directory.'
     )
     parser.add_argument(
         '-o', '--output_dir',
-        default='.',
-        help='The path to the output directory. Default: current directory.'
+        required=True,
+        help='The path to the output directory.'
     )
     return parser
 
@@ -116,4 +126,5 @@ if __name__ == '__main__':
             nrows += nr
 
     percent = float(errors) / float(nrows) * 100.0
-    print 'Finished %s with %.1f%% (%d / %d) skipped lines.' % (sys.argv[0], percent, errors, nrows)
+    print 'Finished %s with %.1f%% (%d / %d) skipped rows, %d remaining rows.' \
+          % (sys.argv[0], percent, errors, nrows, nrows - errors)

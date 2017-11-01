@@ -79,20 +79,20 @@ if __name__ == '__main__':
     print '  Verifying train_size...'
     train_size_read = pd.read_csv(train_file).shape[0]
     print '    %d rows' % train_size_read
-    assert(train_size_read == train_size)
+    assert train_size_read == train_size
 
     dev_file = os.path.join(args.output_dir, 'dev.csv')
     print 'Output dev set to %s...' % dev_file
     df_dev.to_csv(dev_file, index=False)
-    print '  Verifying train_size...'
+    print '  Verifying dev_size...'
     dev_size_read = pd.read_csv(dev_file).shape[0]
     print '    %d rows' % dev_size_read
-    assert(dev_size_read == dev_size)
+    assert dev_size_read == dev_size
 
     test_file = os.path.join(args.output_dir, 'test.csv')
     print 'Output test set to %s...' % test_file
     df_test.to_csv(test_file, index=False)
-    print '  Verifying train_size...'
+    print '  Verifying test_size...'
     test_size_read = pd.read_csv(test_file).shape[0]
     print '    %d rows' % test_size_read
-    assert(test_size_read == test_size)
+    assert test_size_read == test_size

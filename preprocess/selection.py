@@ -5,8 +5,9 @@ import argparse
 
 def process(in_dir, file_name, out_dir, columns):
     new_file = file_name.split('.')[0]
-    out_file = open(os.path.join(out_dir, new_file + '.csv'), 'w')
+    out_file = os.path.join(out_dir, new_file + '.csv')
     df = pd.read_csv(os.path.join(in_dir, file_name), header=0)
+    nrows = df.shape[0]
 
     # Create empty string columns for those not in the column file
     s = set(list(df))
@@ -15,26 +16,30 @@ def process(in_dir, file_name, out_dir, columns):
             df[col] = ''
 
     (df.filter(items=columns)).to_csv(out_file, index=False)
-    out_file.close()
-    print 'Finished file: ' + file_name
+    print 'Finished file %s: %d rows' % (file_name, nrows)
+    nrows_read = pd.read_csv(out_file).shape[0]
+    print '  Verified: %d rows' % nrows_read
+    assert nrows_read == nrows
 
 
 def build_parser():
-    parser = argparse.ArgumentParser(description='Preprocess AirBnB CSV files.')
+    parser = argparse.ArgumentParser(
+        description='Pre-processing step 2: Filter and reorder columns by column file.'
+    )
     parser.add_argument(
         '-i', '--input_dir',
-        default='.',
-        help='The path to the input directory. Default: current directory.'
+        required=True,
+        help='The path to the input directory.'
     )
     parser.add_argument(
         '-o', '--output_dir',
-        default='.',
-        help='The path to the output directory. Default: current directory.'
+        required=True,
+        help='The path to the output directory.'
     )
     parser.add_argument(
-        '-c', '--column_path',
+        '-c', '--column_file',
         required=True,
-        help='The path to the file containing the columns to include. Required.'
+        help='The file containing the columns to include.'
     )
     return parser
 
@@ -60,8 +65,8 @@ if __name__ == '__main__':
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
 
-    cols = get_cols(args.column_path)
+    cols = get_cols(args.column_file)
 
     for fil in os.listdir(args.input_dir):
-        if fil.endswith('.en'):
+        if fil.endswith('.csv'):
             process(args.input_dir, fil, args.output_dir, cols)
