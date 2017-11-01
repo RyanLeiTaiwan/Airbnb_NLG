@@ -56,16 +56,15 @@ def process(nlp, in_file, out_file):
         doc['orig_desc'] = []
 
         for idx_sent, sentence in enumerate(document.sents):
-            # print '  Sent %d: %s' % (idx_sent, list(sentence))
             sent = []
-            # sent['text'] = sentence.text.encode('utf8')
-            # sent['tokens'] = []
 
             for idx_tok, tok in enumerate(sentence):
-                sent.append(tok.text.encode('utf8'))
-            # print
+                # Ignore whitespace tokens
+                if not tok.is_space:
+                    sent.append(tok.text.encode('utf8'))
+            # print '  Sent %d: %s' % (idx_sent, sent)
             doc['orig_desc'].append(sent)
-
+        # print
         results.append(doc)
 
         # Print progress for large files
@@ -78,12 +77,12 @@ def process(nlp, in_file, out_file):
 
     # Output JSON strings only for small files (generating samples for human understanding)
     # with open(out_file, 'w') as fout:
-    #     fout.write(json.dumps(results, indent=4))
+    #     fout.write(json.dumps(results, indent=4, ensure_ascii=False))
 
     print 'spaCy segmentation results saved to %s' % out_file
 
     nrows = len(results)
-    print 'len(results): %d, df.shape[0]: %d' % (nrows, nrows_exp)
+    print 'Verifying len(results): %d, df.shape[0]: %d' % (nrows, nrows_exp)
     assert nrows == nrows_exp
 
 
