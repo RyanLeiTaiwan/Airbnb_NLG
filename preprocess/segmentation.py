@@ -15,8 +15,8 @@ https://spacy.io/docs/usage/models
 model = 'en_core_web_md'
 # Batch size in nlp.pipe()
 batch_size = 1000
-# Number of threads (-1: Let OpenMP decide at run time)
-n_threads = -1
+# Number of threads (-1: Let OpenMP decide at run time, but will not run on AWS)
+n_threads = 32
 
 # Explicitly specify some dtypes to avoid pd.csv_read() DtypeWarning or other problems
 dtype = {'id': int, 'neighbourhood_cleansed': str, 'neighbourhood_group_cleansed': str}
@@ -46,7 +46,7 @@ def process(nlp, in_file, out_file):
         # if idx_doc == 5:
         #     break
 
-        print 'Row: %d, id: %d, city: %s' % (idx_doc, ids[idx_doc], cities[idx_doc])
+        # print 'Row: %d, id: %d, city: %s' % (idx_doc, ids[idx_doc], cities[idx_doc])
         # print document
         doc = OrderedDict()
         # Add some other identifying information for easier human investigation
