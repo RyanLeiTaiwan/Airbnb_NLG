@@ -45,6 +45,6 @@ if __name__ == '__main__':
 
     big_frame.to_csv(args.output_file, index=False)
     print 'Combined CSV files into %s...' % args.output_file
-    nrows_read = pd.read_csv(args.output_file).shape[0]
+    nrows_read = pd.read_csv(args.output_file, dtype=str).shape[0]
     print '  Verified: %d rows' % nrows_read
     assert nrows_read == nrows
