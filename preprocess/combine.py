@@ -31,7 +31,7 @@ if __name__ == '__main__':
         if fil.endswith('.csv'):
             fi = os.path.join(args.input_dir, fil)
             print 'Reading file %s...' % fi
-            df = pd.read_csv(fi, header=0)
+            df = pd.read_csv(fi, header=0, dtype=str)
             nr = df.shape[0]
             print '  %d rows' % nr
             nrows_exp += nr

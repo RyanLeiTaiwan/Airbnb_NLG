@@ -6,7 +6,7 @@ import argparse
 def process(in_dir, file_name, out_dir, columns):
     new_file = file_name.split('.')[0]
     out_file = os.path.join(out_dir, new_file + '.csv')
-    df = pd.read_csv(os.path.join(in_dir, file_name), header=0)
+    df = pd.read_csv(os.path.join(in_dir, file_name), header=0, dtype=str)
     nrows = df.shape[0]
 
     # Create empty string columns for those not in the column file

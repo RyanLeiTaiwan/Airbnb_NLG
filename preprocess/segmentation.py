@@ -69,7 +69,7 @@ def process(nlp, in_file, out_file):
 
         # Print progress for large files
         if (idx_doc + 1) % 1000 == 0:
-            print '==== %d rows' % (idx_doc + 1)
+            print '  %d rows' % (idx_doc + 1)
 
     # Output binary pickle for large files
     with open(out_file, 'wb') as fout:
@@ -99,12 +99,6 @@ def build_parser():
         '-o', '--output_file',
         required=True,
         help='File name of the output JSON for spaCy processing results.'
-    )
-    parser.add_argument(
-        '-v', '--vocab',
-        action='store_false',
-        default=True,
-        help='Flag if no new vocabulary file should be produced. Omit to create a new vocabulary file.'
     )
     return parser
 

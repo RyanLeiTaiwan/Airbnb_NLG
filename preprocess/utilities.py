@@ -26,11 +26,17 @@ def incr(dic, key):
 
 # TODO: Build dtype dictionary needed for pd.csv_read()
 def airbnb_dtype():
-    # dtype = {}
+    # Explicitly specify some dtypes to avoid DtypeWarning in pd.csv_read()
+    dtype = {
+        'jurisdiction_names': str,
+        'zipcode': str,
+        'license': str,
+        'neighbourhood': str
+    }
     # for col in desc_cols:
     #     dtype[col] = str
     # return dtype
-    pass
+    return dtype
 
 
 # Get the complete description by concatenation. row is a Pandas row using iterator
@@ -41,3 +47,9 @@ def complete_description(row):
         if hasattr(row, col):
             build_string.append(getattr(row, col).strip())
     return ' '.join(build_string)
+
+
+# Count tokens in spaCy segmentation results of a row
+# row: a list of sentences, each as a list of tokens
+def count_tokens_in_seg_row(row):
+    return sum([len(sent) for sent in row])

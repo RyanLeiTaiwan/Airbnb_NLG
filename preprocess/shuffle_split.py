@@ -5,9 +5,6 @@ import os
 # Random shuffle seed to make the split reproducible
 shuffle_seed = 11632
 
-# Explicitly specify some dtypes to avoid DtypeWarning in pd.csv_read()
-dtype = {'neighbourhood_group_cleansed': str}
-
 
 def build_parser():
     parser = argparse.ArgumentParser(
@@ -49,7 +46,7 @@ if __name__ == '__main__':
         os.makedirs(args.output_dir)
 
     print 'Reading input file: %s...' % args.input_file
-    df = pd.read_csv(args.input_file, header=0, dtype=dtype)
+    df = pd.read_csv(args.input_file, header=0, dtype=str)
     total_size = df.shape[0]
     print 'Total size: %d rows' % total_size
 
