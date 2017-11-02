@@ -30,8 +30,10 @@ def topics_by_keywords(seg_one, fp_tuple_list, row):
         keywords = topic_keywords[topic_name]
         columns = topic_columns[topic_name]
 
-        description = row['description']
-        fp_rank.write('id: %s, city: %s\n' % (row['id'], row['city']))
+        description = re.sub('\s+', ' ', row['description']).strip()
+        id = re.sub('\s+', ' ', row['id']).strip()
+        city = re.sub('\s+', ' ', row['city']).strip()
+        fp_rank.write('id: %s, city: %s\n' % (id, city))
         fp_rank.write('%s\n\n' % description)
 
         # Use pre-run sentence/word segmentation results
@@ -80,20 +82,20 @@ def topics_by_keywords(seg_one, fp_tuple_list, row):
         # ====  if target description is not skipped  ====
 
         # Output identifying information to file_name.id
-        fp_id.write('%s %s\n' % (row['id'], row['city']))
+        fp_id.write('%s %s\n' % (id, city))
 
         # Output topic columns to file_name.data
         data_output = []
         for col in columns:
             value = row[col]
             if value is not None and value != '':
-                value = value.strip()
+                value = re.sub('\s+', ' ', value).strip()
                 if col == 'street':
                     info = handle_street(value)
                 elif col in ['bedrooms', 'bathrooms']:
                     info = handle_bedrooms_bathrooms(value, col)
                 else:
-                    info = re.sub('\s+', ' ', value)
+                    info = value
                 # Work around nasty Unicode bugs. Otherwise, next statement leads to UnicodeDecodeError
                 # data_output.append(info.decode('utf8'))
                 data_output.append(info)

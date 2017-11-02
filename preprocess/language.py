@@ -9,7 +9,8 @@ from langdetect import detect, DetectorFactory
 # https://github.com/Mimino666/langdetect
 DetectorFactory.seed = 0
 
-
+# TODO: Consider removing all newline characters from the beginning to avoid mismatching number of lines
+# string = re.sub('\s+', ' ', string).strip() or Pandas string method
 def process(in_dir, file_name, out_dir):
     new_file = file_name.split('.')[0]
     out_file = os.path.join(out_dir, new_file + '.csv')
