@@ -16,7 +16,7 @@ wordnet = WordNetLemmatizer()
 
 # TODO: Implement sentence ranking and column processing
 # fp_tuple_list: tuple of (fp_data_list, fp_desc_list, fp_rank_list), each as a list of file pointer per topic
-def topics_by_keywords(fp_tuple_list, row, header_cols, description, stats):
+def topics_by_keywords(fp_tuple_list, row, description, stats):
     # Unpack tuple into file pointer lists
     (fp_data_list, fp_desc_list, fp_rank_list) = fp_tuple_list
     global total_line_skips
@@ -62,15 +62,17 @@ def topics_by_keywords(fp_tuple_list, row, header_cols, description, stats):
             if len(desc_str) >= MIN_DESC_CHARS:
                 fp_desc.write(desc_str.encode('utf8') + '\n')
             else:
-                pass
                 # stats.skip_rows += 1
                 # Stats.total_skip_rows += 1
+                # Skip to the next topic
+                continue
         else:
-            pass
             # stats.skip_rows += 1
             # Stats.total_skip_rows += 1
+            # Skip to the next topic
+            continue
 
-        # Output topic columns to city_name.data
+        # Output topic columns to city_name.data (if not running either continue statement)
         data_output = []
         for col in columns:
             value = row[col]
