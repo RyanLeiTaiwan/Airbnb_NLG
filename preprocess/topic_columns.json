@@ -1,0 +1,21 @@
+{
+    "space": [
+        "name",
+        "bedrooms",
+        "bathrooms",
+        "property_type",
+        "room_type",
+        "street",
+        "neighbourhood_cleansed",
+        "city",
+        "country"
+    ],
+    "nearby": [
+        "name",
+        "street",
+        "neighbourhood_cleansed",
+        "city",
+        "zipcode",
+        "country"
+    ]
+}
