@@ -253,6 +253,10 @@ def add_arguments(parser):
       Number of translations generated for each sentence. This is only used for
       inference.\
       """))
+  parser.add_argument("--decoder_type", type=str, default="greedy", 
+                      help="type of decoder, greedy | sampling")
+  parser.add_argument("--temperature", type=float, default=1.0, 
+                      help="softmax temperature")
 
   # Job info
   parser.add_argument("--jobid", type=int, default=0,
@@ -318,7 +322,9 @@ def create_hparams(flags):
       beam_width=flags.beam_width,
       length_penalty_weight=flags.length_penalty_weight,
       num_translations_per_input=flags.num_translations_per_input,
-
+      decoder_type=flags.decoder_type,
+      temperature=flags.temperature,
+      
       # Vocab
       sos=flags.sos if flags.sos else vocab_utils.SOS,
       eos=flags.eos if flags.eos else vocab_utils.EOS,
