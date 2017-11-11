@@ -476,7 +476,7 @@ python -m nmt.nmt \
     --out_dir=/tmp/nmt_model \
     --inference_input_file=/tmp/my_infer_file.vi \
     --inference_output_file=/tmp/nmt_model/output_infer \
-    *--override_loaded_hparams=True* \
+    --override_loaded_hparams=True \
     --decoder_type=sampling \
     --temperature=1.0 \
     ... (need to include other network properties like num_units, attention, 
@@ -484,6 +484,9 @@ python -m nmt.nmt \
 
 cat /tmp/nmt_model/output_infer # To view the inference as output
 ```
+
+Specifying the *override_loaded_hparams* choice will enable you to modify the
+parameters from the training parameters.
 
 Note the above commands can also be run while the model is still being trained
 as long as there exists a training
