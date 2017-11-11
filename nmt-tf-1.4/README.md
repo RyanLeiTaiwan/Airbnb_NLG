@@ -435,10 +435,16 @@ the model. Here's the code to achieve greedy decoding.  It is very similar to
 the training decoder.
 
 ``` python
-# Helper
+# Helper for greedy decoding
 helper = tf.contrib.seq2seq.GreedyEmbeddingHelper(
     embedding_decoder,
     tf.fill([batch_size], tgt_sos_id), tgt_eos_id)
+
+# Helper for sampling
+helper = tf.contrib.seq2seq.SampleEmbeddingHelper(
+    embedding_decoder, 
+    tf.fill([batch_size], tgt_sos_id), tgt_eos_id, 
+    temperature)
 
 # Decoder
 decoder = tf.contrib.seq2seq.BasicDecoder(
@@ -469,7 +475,12 @@ cat > /tmp/my_infer_file.vi
 python -m nmt.nmt \
     --out_dir=/tmp/nmt_model \
     --inference_input_file=/tmp/my_infer_file.vi \
-    --inference_output_file=/tmp/nmt_model/output_infer
+    --inference_output_file=/tmp/nmt_model/output_infer \
+    *--override_loaded_hparams=True* \
+    --decoder_type=sampling \
+    --temperature=1.0 \
+    ... (need to include other network properties like num_units, attention, 
+          shared_vocab, num_layers, encoder_type. Otherwise will be default)
 
 cat /tmp/nmt_model/output_infer # To view the inference as output
 ```
