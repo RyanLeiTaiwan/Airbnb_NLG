@@ -383,7 +383,8 @@ def _internal_eval(model, global_step, sess, iterator, iterator_feed_dict,
                    summary_writer, label):
   """Computing perplexity."""
   sess.run(iterator.initializer, feed_dict=iterator_feed_dict)
-  ppl = model_helper.compute_perplexity(model, sess, label)
+  ppl, loss = model_helper.compute_perplexity(model, sess, label)
+  utils.add_summary(summary_writer, global_step, "%s_loss" % label, loss)
   utils.add_summary(summary_writer, global_step, "%s_ppl" % label, ppl)
   return ppl
 

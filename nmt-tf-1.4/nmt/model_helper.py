@@ -440,6 +440,8 @@ def compute_perplexity(model, sess, name):
     The perplexity of the eval outputs.
   """
   total_loss = 0
+  avg_single_loss = 0.0
+  iters = 0
   total_predict_count = 0
   start_time = time.time()
 
@@ -448,10 +450,13 @@ def compute_perplexity(model, sess, name):
       loss, predict_count, batch_size = model.eval(sess)
       total_loss += loss * batch_size
       total_predict_count += predict_count
+      avg_single_loss += loss
+      iters += 1
     except tf.errors.OutOfRangeError:
       break
 
+  avg_single_loss = avg_single_loss / iters
   perplexity = utils.safe_exp(total_loss / total_predict_count)
-  utils.print_time("  eval %s: perplexity %.2f" % (name, perplexity),
+  utils.print_time("  eval %s: perplexity %.2f, loss %.2f" % (name, perplexity, avg_single_loss),
                    start_time)
-  return perplexity
+  return perplexity, avg_single_loss
