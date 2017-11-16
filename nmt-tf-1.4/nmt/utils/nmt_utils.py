@@ -59,6 +59,8 @@ def decode_and_evaluate(name,
 
           batch_size = nmt_outputs.shape[1]
           num_sentences += batch_size
+          # Print progress per batch because beam search decoder is a lot slower
+          utils.print_out("  %d sentences" % num_sentences)
 
           for sent_id in range(batch_size):
             for beam_id in range(num_translations_per_input):
