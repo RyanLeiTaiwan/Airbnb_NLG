@@ -260,8 +260,8 @@ def create_emb_for_encoder_and_decoder(share_vocab,
         raise ValueError("Share embedding but different src/tgt vocab sizes"
                          " %d vs. %d" % (src_vocab_size, tgt_vocab_size))
       utils.print_out("# Use the same source embeddings for target")
-      embedding = tf.get_variable(
-          "embedding_share", [src_vocab_size, src_embed_size], dtype)
+      embeddings = init_word2vec()
+      embedding = tf.get_variable(name="embedding_share", shape=[src_vocab_size, src_embed_size], dtype=dtype, initializer=tf.constant_initializer(embeddings), trainable=False)
       embedding_encoder = embedding
       embedding_decoder = embedding
     else:
@@ -275,6 +275,28 @@ def create_emb_for_encoder_and_decoder(share_vocab,
 
   return embedding_encoder, embedding_decoder
 
+
+def init_word2vec():
+  vocab = {}
+  inv_dict = []
+  with open("/Users/susie/Desktop/topic1/airbnb/vocab.data") as f:
+    i = 0
+    for line in f:
+      word = line.strip()
+      inv_dict.append(word)
+      vocab[word] = i
+      i = i + 1
+  vocab_size = len(inv_dict)
+  emb_size = 300
+  embeddings = np.zeros((vocab_size, emb_size))
+  model = gensim.models.KeyedVectors.load_word2vec_format('/Users/susie/Downloads/GoogleNews-vectors-negative300.bin', binary=True)
+
+  for k, v in vocab.items():
+    try:
+      embeddings[v] = model[k]
+    except KeyError:
+      print("not in vocabulary")
+  return np.asarray(embeddings)
 
 def _single_cell(unit_type, num_units, forget_bias, dropout,
                  mode, residual_connection=False, device_str=None):
