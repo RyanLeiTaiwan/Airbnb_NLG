@@ -14,7 +14,7 @@ import sys
 if __name__ == '__main__':
     if len(sys.argv) != 5:
         print 'Usage: %s INPUT_FILE REF_FILE NLG_FILE MERGED_FILE' % sys.argv[0]
-        print 'Example: %s test_set.data test_set.desc test_set.out merged.txt'
+        print 'Example: %s test_set.data test_set.desc test_set.out merged.txt' % sys.argv[0]
         exit(0)
 
     with open(sys.argv[1], 'r') as f:

@@ -4,19 +4,6 @@ Shared utility classes and functions
 from const import *
 
 
-# Pre-processing statistics
-# TODO: topic_skip_rows[] instance variable
-class Stats:
-    total_nrows = 0
-    total_skip_rows = 0
-    total_err_rows = 0
-
-    def __init__(self):
-        self.nrows = 0
-        self.skip_rows = 0
-        self.err_rows = 0
-
-
 def incr(dic, key):
     if key in dic:
         dic[key] += 1
