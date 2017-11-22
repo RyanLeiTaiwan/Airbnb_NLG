@@ -71,6 +71,7 @@ class BaseModel(object):
     self.num_layers = hparams.num_layers
     self.num_gpus = hparams.num_gpus
     self.time_major = hparams.time_major
+    self.word_embed = hparams.word_embed
 
     # extra_args: to make it flexible for adding external customizable code
     self.single_cell_fn = None
@@ -222,6 +223,7 @@ class BaseModel(object):
             src_embed_size=hparams.num_units,
             tgt_embed_size=hparams.num_units,
             num_partitions=hparams.num_embeddings_partitions,
+            word_embed = hparams.word_embed,
             scope=scope,))
 
   def train(self, sess):

@@ -1,4 +1,4 @@
-# Copyright 2017 Google Inc. All Rights Reserved.
+f# Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -263,6 +263,11 @@ def add_arguments(parser):
                       help="Task id of the worker.")
   parser.add_argument("--num_workers", type=int, default=1,
                       help="Number of workers (inference only).")
+  
+  # word embedding
+  parser.add_argument("--word_embed", type=str, default=None, 
+                      help="pretrained word embedding init: None, word2vec or glove")
+  
 
 
 def create_hparams(flags):
@@ -342,6 +347,7 @@ def create_hparams(flags):
       metrics=flags.metrics.split(","),
       log_device_placement=flags.log_device_placement,
       random_seed=flags.random_seed,
+      word_embed = flags.word_embed,
       override_loaded_hparams=flags.override_loaded_hparams,
   )
 
