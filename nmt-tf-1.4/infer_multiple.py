@@ -4,11 +4,6 @@ import os
 def build_parser():
 	parser = argparse.ArgumentParser(description='Generate descriptions.')
 	parser.add_argument(
-		'--nmt',
-		required=True,
-		help='nmt model path'
-	)
-	parser.add_argument(
 		'--model',
 		required=True,
 		help='trained model'
