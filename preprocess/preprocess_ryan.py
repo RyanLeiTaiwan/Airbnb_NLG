@@ -16,8 +16,6 @@ def process(seg, in_file, out_dir):
     # CSV File name without full path or extension
     file_name = os.path.splitext(os.path.basename(in_file))[0]
 
-    stats = Stats()
-
     # Open files all in one place (three lists of file pointers)
     fp_id_list = []
     fp_data_list = []
