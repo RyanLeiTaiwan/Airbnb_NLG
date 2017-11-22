@@ -9,27 +9,50 @@ nlg:
 3. xxx
 ...
 """
-import sys
+import argparse
+
+def build_parser():
+    parser = argparse.ArgumentParser(description='Format output by merging input, reference, NLG files.')
+    parser.add_argument(
+        '-i', '--input',
+        required=True,
+        help='Data input file (.data)'
+    )
+    parser.add_argument(
+        '-r', '--ref',
+        required=True,
+        help='Reference file (.desc)'
+    )
+    parser.add_argument(
+        '-n', '--nlg',
+        required=True,
+        help='NLG output file'
+    )
+    parser.add_argument(
+        '-o', '--output',
+        required=True,
+        help='Output merged file'
+    )
+    return parser
+
 
 if __name__ == '__main__':
-    if len(sys.argv) != 5:
-        print 'Usage: %s INPUT_FILE REF_FILE NLG_FILE MERGED_FILE' % sys.argv[0]
-        print 'Example: %s test_set.data test_set.desc test_set.out merged.txt' % sys.argv[0]
-        exit(0)
+    parser = build_parser()
+    args = parser.parse_args()
 
-    with open(sys.argv[1], 'r') as f:
+    with open(args.input, 'r') as f:
         input = f.read().splitlines()
         lines_input = len(input)
     print 'input: %d lines' % lines_input
 
-    with open(sys.argv[2], 'r') as f:
+    with open(args.ref, 'r') as f:
         ref = f.read().splitlines()
         lines_ref = len(ref)
     print 'ref: %d lines' % lines_ref
 
     assert lines_input == lines_ref
 
-    with open(sys.argv[3], 'r') as f:
+    with open(args.nlg, 'r') as f:
         nlg = f.read().splitlines()
         lines_nlg = len(nlg)
     print 'nlg: %d lines' % lines_nlg
@@ -39,7 +62,7 @@ if __name__ == '__main__':
     assert lines_input * nlg_lines_per_input == lines_nlg
     print '=> %d nlg lines per input line' % nlg_lines_per_input
 
-    with open(sys.argv[4], 'w') as f:
+    with open(args.output, 'w') as f:
         # For each property
         for prop in range(lines_input):
             # For each description in beam search or greedy sampling results
@@ -48,6 +71,6 @@ if __name__ == '__main__':
             f.write('nlg:\n')
             for desc in range(nlg_lines_per_input):
                 f.writelines('%2d. %s\n' % (desc + 1, nlg[nlg_lines_per_input * prop + desc]))
-            f.write('\n')
+            f.write('=' * 32 + '\n')
 
-    print 'Finished writing the merged file to %s' % sys.argv[4]
+    print 'Finished writing the merged file to %s' % args.output
