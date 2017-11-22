@@ -268,7 +268,7 @@ def create_emb_for_encoder_and_decoder(share_vocab,
       elif "word2vec" in word_embed or "glove" in word_embed:
           utils.print_out("Loading word embedding: %s" % word_embed, new_line=True)
           word2vec_emd = np.load(word_embed+".pickle")
-          embedding = tf.get_variable(name="embedding_share", shape=[src_vocab_size, src_embed_size], dtype=dtype, initializer=tf.constant_initializer(word2vec_emd), trainable=False)
+          embedding = tf.get_variable(name="embedding_share", shape=[src_vocab_size, src_embed_size], dtype=dtype, initializer=tf.constant_initializer(word2vec_emd), trainable=True)
       else:
           embedding = None
 
