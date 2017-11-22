@@ -60,7 +60,15 @@ def decode_and_evaluate(name,
 
       while True:
         try:
-          nmt_outputs, _ = model.decode(sess)
+          if beam_width > 0:
+            nmt_outputs, _ = model.decode(sess)
+          else:
+            # greedy or sampling decoder, just decoding several times
+            nmt_outputs = []          
+            for candidate_sent_id in range(num_translations_per_input):
+              one_nmt_output, _ = model.decode(sess)
+              nmt_outputs.append(one_nmt_output)
+            nmt_outputs = np.array(nmt_outputs)
 
           batch_size = nmt_outputs.shape[1]
           num_sentences += batch_size

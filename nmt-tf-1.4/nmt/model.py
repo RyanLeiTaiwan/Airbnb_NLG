@@ -105,15 +105,8 @@ class BaseModel(object):
       self.eval_loss = res[1]
     elif self.mode == tf.contrib.learn.ModeKeys.INFER:
       self.infer_logits, _, self.final_context_state, self.sample_id = res
-      if hparams.beam_width > 0:
-        self.sample_words = reverse_target_vocab_table.lookup(
-            tf.to_int64(self.sample_id))
-      else:
-        self.sample_words = []
-        for one_id in self.sample_id:
-          self.sample_words.append(reverse_target_vocab_table.lookup(
-            tf.to_int64(one_id)))
-        self.sample_words = np.array(self.sample_words)
+      self.sample_words = reverse_target_vocab_table.lookup(
+          tf.to_int64(self.sample_id))
 
     if self.mode != tf.contrib.learn.ModeKeys.INFER:
       ## Count the number of predicted words for compute ppl.
@@ -271,21 +264,12 @@ class BaseModel(object):
     dtype = tf.float32
     num_layers = hparams.num_layers
     num_gpus = hparams.num_gpus
-    num_translations_per_input = hparams.num_translations_per_input
-    beam_width = hparams.beam_width
 
     with tf.variable_scope(scope or "dynamic_seq2seq", dtype=dtype):
       # Encoder
       encoder_outputs, encoder_state = self._build_encoder(hparams)
 
       ## Decoder
-      if self.mode == tf.contrib.learn.ModeKeys.INFER and beam_width == 0:
-        sample_id = []
-        for num_id in range(num_translations_per_input):
-          logits, one_sample_id, final_context_state = self._build_decoder(
-            encoder_outputs, encoder_state, hparams)
-          sample_id.append(one_sample_id)
-      else:
       logits, sample_id, final_context_state = self._build_decoder(
           encoder_outputs, encoder_state, hparams)
 
@@ -532,8 +516,7 @@ class BaseModel(object):
 
     # make sure outputs is of shape [batch_size, time]
     if self.time_major:
-      for num_id in range(sample_words.shape[0]):
-        sample_words[num_id] = sample_words[num_id].transpose()
+      sample_words = sample_words.transpose()
     return sample_words, infer_summary
 
 
