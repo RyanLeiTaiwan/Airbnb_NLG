@@ -7,7 +7,7 @@ import time
 import tensorflow as tf
 
 from tensorflow.python.ops import lookup_ops
-
+import numpy as np
 from .utils import iterator_utils
 from .utils import misc_utils as utils
 from .utils import vocab_utils
@@ -216,6 +216,7 @@ def create_emb_for_encoder_and_decoder(share_vocab,
                                        tgt_vocab_size,
                                        src_embed_size,
                                        tgt_embed_size,
+                                       word_embed,
                                        dtype=tf.float32,
                                        num_partitions=0,
                                        scope=None):
