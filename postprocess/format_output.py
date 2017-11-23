@@ -66,11 +66,11 @@ if __name__ == '__main__':
         # For each property
         for prop in range(lines_input):
             # For each description in beam search or greedy sampling results
-            f.write('intput: %s\n' % input[prop])
-            f.write('ref: %s\n' % ref[prop])
-            f.write('nlg:\n')
+            f.write('INPUT: %s\n' % input[prop])
+            f.write('REF: %s\n' % ref[prop])
+            f.write('NLG:\n')
             for desc in range(nlg_lines_per_input):
-                f.writelines('%2d. %s\n' % (desc + 1, nlg[nlg_lines_per_input * prop + desc]))
-            f.write('=' * 32 + '\n')
+                f.write('%2d. %s\n' % (desc + 1, nlg[nlg_lines_per_input * prop + desc]))
+            f.write('=' * 80 + '\n')
 
     print 'Finished writing the merged file to %s' % args.output
