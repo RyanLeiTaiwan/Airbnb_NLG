@@ -16,7 +16,7 @@ wordnet = WordNetLemmatizer()
 
 # seg_one: sentence/word segmentation results of one property (row)
 # fp_tuple_list: (fp_id_list, fp_data_list, fp_desc_list, fp_rank_list), each as a list of file pointers for all topics
-def topics_by_keywords(seg_one, fp_tuple_list, row):
+def topics_by_keywords(seg_one, fp_tuple_list, row, keep_all):
     # Unpack tuple into file pointer lists
     (fp_id_list, fp_data_list, fp_desc_list, fp_rank_list) = fp_tuple_list
 
@@ -60,10 +60,11 @@ def topics_by_keywords(seg_one, fp_tuple_list, row):
         fp_rank.write('\n')
 
         # Collect all sentences >= MIN_KEYWORD_SCORE as description
+        # However, no filtering in keep_all mode
         desc_output = []
         tok_count = 0
         for idx in idx_sort:
-            if -scores[idx] < MIN_KEYWORD_SCORE:
+            if not keep_all and -scores[idx] < MIN_KEYWORD_SCORE:
                 break
 
             added_toks = len(sentences[idx])
@@ -74,7 +75,7 @@ def topics_by_keywords(seg_one, fp_tuple_list, row):
         desc_str = ' '.join(desc_output).lower()
 
         # Output to file_name.desc only if the selected sentences contain enough characters/tokens
-        if len(desc_str) >= MIN_DESC_CHARS and tok_count >= MIN_DESC_TOKENS:
+        if keep_all or (len(desc_str) >= MIN_DESC_CHARS and tok_count >= MIN_DESC_TOKENS):
             fp_desc.write(desc_str + '\n')
         else:
             # Skip to the next topic

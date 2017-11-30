@@ -10,9 +10,9 @@ import cPickle
 
 
 # seg: sentence/word segmentation results by spaCy
-def process(seg, in_file, out_dir):
+def process(seg, args):
     # Unpack command-line arguments
-    in_file, output_dir = args.input_file, args.output_dir
+    in_file, output_dir, keep_all = args.input_file, args.output_dir, args.keep_all
     # CSV File name without full path or extension
     file_name = os.path.splitext(os.path.basename(in_file))[0]
 
@@ -45,7 +45,7 @@ def process(seg, in_file, out_dir):
 
     print 'Processing...'
     for idx, row in df.iterrows():
-        # TODO: Use original description for now constrained by spaCy results
+        # TODO: For now, use original description to comply with spaCy results
         description = row['description']
         # description = complete_description(row)
         # print description
@@ -53,8 +53,11 @@ def process(seg, in_file, out_dir):
         # Skip descriptions of too few characters or tokens
         # print seg[idx]['orig_desc']
         tokens_count = count_tokens_in_seg_row(seg[idx]['orig_desc'])
-        if description is not None and len(description) >= MIN_DESC_CHARS and tokens_count >= MIN_DESC_TOKENS:
-            process_by_topics(seg[idx], fp_id_list, fp_data_list, fp_desc_list, fp_rank_list, row)
+        len_test = description is not None and len(description) >= MIN_DESC_CHARS and tokens_count >= MIN_DESC_TOKENS
+        if not len_test:
+            print '%s: %s' % (row['id'], description)
+        if keep_all or len_test:
+            process_by_topics(seg[idx], fp_id_list, fp_data_list, fp_desc_list, fp_rank_list, row, keep_all)
         else:
             len_errs += 1
 
@@ -92,10 +95,11 @@ def process(seg, in_file, out_dir):
 # seg_one: sentence/word segmentation results of one property (row)
 # fp_id_list, fp_data_list, fp_desc_list, fp_rank_list: lists of file pointers
 # row: a Pandas row using iterator
+# keep_all: no filtering mode
 # This will call all other topics_by_XXX() functions
-def process_by_topics(seg_one, fp_id_list, fp_data_list, fp_desc_list, fp_rank_list, row):
+def process_by_topics(seg_one, fp_id_list, fp_data_list, fp_desc_list, fp_rank_list, row, keep_all):
     assert len(fp_id_list) == len(fp_data_list) == len(fp_desc_list) == len(fp_rank_list)
-    topics_by_keywords(seg_one, (fp_id_list, fp_data_list, fp_desc_list, fp_rank_list), row)
+    topics_by_keywords(seg_one, (fp_id_list, fp_data_list, fp_desc_list, fp_rank_list), row, keep_all)
 
 
 def build_parser():
@@ -112,8 +116,14 @@ def build_parser():
     )
     parser.add_argument(
         '-o', '--output_dir',
-        default='processed',
-        help='The path to the output directory. Default: directory "processed/".'
+        required=True,
+        help='The path to the output directory.'
+    )
+    parser.add_argument(
+        '-k', '--keep_all',
+        action='store_true',
+        default=False,
+        help='Keep-all (no filtering) mode. Use this flag for pre-processing test set'
     )
     return parser
 
@@ -121,6 +131,9 @@ def build_parser():
 if __name__ == '__main__':
     parser = build_parser()
     args = parser.parse_args()
+
+    if args.keep_all:
+        print '** Running in keep-all (no filtering) mode...'
 
     # Create output directory if it does not exist
     if not os.path.exists(args.output_dir):
@@ -132,5 +145,5 @@ if __name__ == '__main__':
     seg_file.close()
     print '  %d rows' % len(seg)
 
-    process(seg, args.input_file, args.output_dir)
+    process(seg, args)
 
