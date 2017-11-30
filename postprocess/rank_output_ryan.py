@@ -1,6 +1,6 @@
 # Rank Seq2Seq output by merging input, reference, and NLG files, assuming we generate N descriptions per input line
 """
-[Merged format]
+[Merged format for human investigation]
 INPUT: xxx
 REF: xxx
 NLG: (SCORE: total score, G: grammar, I: input information, K: keywords)
@@ -145,17 +145,17 @@ def build_parser():
     )
     parser.add_argument(
         '-t', '--topic',
-        help='Topic name'
+        help='Topic name (amenity, nearby, transit)'
     )
     parser.add_argument(
         '-oh', '--output_human',
         required=True,
-        help='Output merged file for human investigation (with formatting)'
+        help='Output merged file for human investigation'
     )
     parser.add_argument(
         '-om', '--output_machine',
         required=True,
-        help='Output merged file for machine processing (without formatting)'
+        help='Output merged file for machine processing'
     )
     return parser
 
@@ -213,7 +213,8 @@ if __name__ == '__main__':
         for desc in range(nlg_lines_per_input):
             f_human.write('[SCORE: %2d, G: %2d, I: %2d, K: %2d] %s\n' %
                           (score[desc], grammar[desc], info[desc], keyword[desc], nlg_sorted[desc]))
-            f_machine.write('%s\n' % nlg_sorted[desc])
+            # Machine output format: "score nlg_description"
+            f_machine.write('%d %s\n' % (score[desc], nlg_sorted[desc]))
         f_human.write('=' * 80 + '\n')
 
     f_human.close()
