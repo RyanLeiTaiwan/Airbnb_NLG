@@ -22,11 +22,16 @@ def output_selected_features():
         print len(df)
         f2.write( "id|street|neighbourhood_cleansed|city|zipcode|country|desc_concat|best_sentence|entities\n") 
         for index, row in df.iterrows():
-                desc = str(index) + " "
+                desc = ""
                 for column in ['neighborhood_overview', 'summary', 'space', 'transit']:
                         if not pd.isnull(row[column]):
                                 desc += str(row[column])
                 splitted_sen = nltk.sent_tokenize(desc)
+                # first_loc_sent = ""
+                # if not pd.isnull(row["neighborhood_overview"]):
+                        # first_loc_sent = nltk.sent_tokenize(unicode(str(row["neighborhood_overview"]), "utf-8"))[0]
+                # else:
+                        # first_loc_sent = splitted_sen[0]
                 max_count = 0
                 best_sentence = ""
                 entities = []
@@ -38,11 +43,12 @@ def output_selected_features():
                                 if ent.label_ in ['ORG', 'GPE', 'LOC', 'FAC']:
                                         count += 1
                                         tmp.append(str(ent.text))
-                                if max_count < count:
-                                        best_sentence = str(sentence)
-                                        entities = tmp
+                        if max_count < count:
+                                best_sentence = str(sentence)
+                                entities = tmp
                 if best_sentence == "":
                         continue
+                        # best_sentence = first_loc_sent
                 new_line = str(row["id"])+"|" +str(row["street"])+"|" +str(row["neighbourhood_cleansed"])+"|" + \
                         str(row["city"])+"|" +str(row["zipcode"])+"|" +str(row["country"])+"|" +str(desc).replace("|","")+"|" +\
                         str(best_sentence).replace("|","")+"|" + str(', '.join(entities))
