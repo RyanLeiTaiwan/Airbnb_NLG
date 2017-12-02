@@ -35,8 +35,7 @@ wordnet = WordNetLemmatizer()
 
 # Rank output per property
 # nlg_list: list of nlg_lines_per_input descriptions
-def rank_output(input, ref, nlg_list, keywords):
-    nlg_list = np.array(nlg_list)
+def rank_output(input, nlg_list, keywords):
     num_desc = len(nlg_list)
     grammar = np.zeros(num_desc)
     info = np.zeros(num_desc)
@@ -180,8 +179,9 @@ if __name__ == '__main__':
         nlg = f.read().splitlines()
         lines_nlg = len(nlg)
     print 'nlg: %d lines' % lines_nlg
+    nlg = np.array(nlg)
 
-    # Make sure len_nlg is an integer multiple of len_input
+    # Make sure lines_nlg is an integer multiple of lines_input
     nlg_lines_per_input = lines_nlg // lines_input
     assert lines_input * nlg_lines_per_input == lines_nlg
     print '=> %d nlg lines per input line' % nlg_lines_per_input
@@ -200,21 +200,21 @@ if __name__ == '__main__':
         if (prop + 1) % 100 == 0:
             print '  %d properties' % (prop + 1)
 
-        # For each description in beam search or greedy sampling results
         f_human.write('INPUT: %s\n' % input[prop])
         f_human.write('REF: %s\n' % ref[prop])
         f_human.write('NLG:\n')
 
+        nlg_list = nlg[nlg_lines_per_input * prop : nlg_lines_per_input * (prop + 1)]
         # Call the ranking function
-        nlg_slice = nlg[nlg_lines_per_input * prop : nlg_lines_per_input * (prop + 1)]
-        score, grammar, info, keyword, nlg_sorted = \
-            rank_output(input[prop], ref[prop], nlg_slice, keywords)
+        score, grammar, info, keyword, nlg_ranked = \
+            rank_output(input[prop], nlg_list, keywords)
 
+        # For each description in ranked results
         for desc in range(nlg_lines_per_input):
             f_human.write('[SCORE: %2d, G: %2d, I: %2d, K: %2d] %s\n' %
-                          (score[desc], grammar[desc], info[desc], keyword[desc], nlg_sorted[desc]))
+                          (score[desc], grammar[desc], info[desc], keyword[desc], nlg_ranked[desc]))
             # Machine output format: "score nlg_description"
-            f_machine.write('%d %s\n' % (score[desc], nlg_sorted[desc]))
+            f_machine.write('%d %s\n' % (score[desc], nlg_ranked[desc]))
         f_human.write('=' * 80 + '\n')
 
     f_human.close()
