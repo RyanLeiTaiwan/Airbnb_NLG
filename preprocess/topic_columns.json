@@ -12,6 +12,7 @@
     ],
     "nearby": [
         "name",
+        "property_type",
         "street",
         "neighbourhood_cleansed",
         "city",
