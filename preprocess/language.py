@@ -9,8 +9,7 @@ from langdetect import detect, DetectorFactory
 # https://github.com/Mimino666/langdetect
 DetectorFactory.seed = 0
 
-# TODO: Consider removing all newline characters from the beginning to avoid mismatching number of lines
-# string = re.sub('\s+', ' ', string).strip() or Pandas string method
+
 def process(in_dir, file_name, out_dir):
     new_file = file_name.split('.')[0]
     out_file = os.path.join(out_dir, new_file + '.csv')
@@ -24,7 +23,7 @@ def process(in_dir, file_name, out_dir):
     dup_errs = 0
     other_errs = 0
 
-    # Use keeps (df.iloc) instead of drops (df.drop) for 2x speed increase
+    # Use keeps (df.iloc) instead of drops (df.drop) for efficiency
     keeps = []
 
     for idx, row in df.iterrows():
@@ -33,7 +32,7 @@ def process(in_dir, file_name, out_dir):
             space = row['space']
             description = row['description']
             if description is not np.nan and len(description) > 20:
-                # Airbnb users almost always fill in either of summary and space
+                # Airbnb users almost always fill in either summary and space
                 if (summary is np.nan or summary not in seen_summary) and (space is np.nan or space not in seen_space):
                     if summary is not np.nan:
                         seen_summary.add(summary)

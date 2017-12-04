@@ -6,13 +6,14 @@ import json
 import argparse
 
 """
-Specify model used by spaCy. Please install corresponding package first
+Note: Run with spaCy 2.0 at the time of writing
+Specify model used by spaCy. Please install corresponding packages first
 https://spacy.io/docs/usage/models
 """
 # Model for debugging
 # model = 'en_core_web_sm'
 # Model for formal run
-model = 'en_core_web_md'
+model = 'en_core_web_lg'
 # Batch size in nlp.pipe()
 batch_size = 1000
 # Number of threads (-1: Let OpenMP decide at run time, but will not run on AWS)
@@ -42,10 +43,6 @@ def process(nlp, in_file, out_file):
     cities = list(df['city'])
 
     for idx_doc, document in enumerate(nlp.pipe(descriptions, batch_size=batch_size, n_threads=n_threads)):
-        # Debug purpose
-        # if idx_doc == 5:
-        #     break
-
         # print 'Row: %d, id: %d, city: %s' % (idx_doc, ids[idx_doc], cities[idx_doc])
         # print document
         doc = OrderedDict()
@@ -68,7 +65,7 @@ def process(nlp, in_file, out_file):
         results.append(doc)
 
         # Print progress for large files
-        if (idx_doc + 1) % 1000 == 0:
+        if (idx_doc + 1) % batch_size == 0:
             print '  %d rows' % (idx_doc + 1)
 
     # Output binary pickle for large files
