@@ -265,7 +265,7 @@ def add_arguments(parser):
                       help="Number of workers (inference only).")
   
   # word embedding
-  parser.add_argument("--word_embed", type=str, default=None, 
+  parser.add_argument("--word_embed", type=str, default="None",
                       help="pretrained word embedding init: None, word2vec or glove")
   
 
