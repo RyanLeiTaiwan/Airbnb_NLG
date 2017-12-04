@@ -2,21 +2,26 @@
 from utilities import *
 from const import *
 from topics_by_keywords import topics_by_keywords
+from handle_columns import *
+from selection import get_cols
 # Import built-in or 3rd-party modules
 import pandas as pd
 import os
 import argparse
 import cPickle
+import re
 
 
 # seg: sentence/word segmentation results by spaCy
-def process(seg, args):
+# all_cols: list of all columns defined in column file
+def process(seg, all_cols, args):
     # Unpack command-line arguments
     in_file, output_dir, keep_all = args.input_file, args.output_dir, args.keep_all
     # CSV File name without full path or extension
     file_name = os.path.splitext(os.path.basename(in_file))[0]
 
     # Open files all in one place (three lists of file pointers)
+    fp_all_columns = open(os.path.join(output_dir, file_name + '.cols'), 'w')
     fp_id_list = []
     fp_data_list = []
     fp_desc_list = []
@@ -57,6 +62,7 @@ def process(seg, args):
         # if not len_test:
         #     print '%s: %s' % (row['id'], description)
         if keep_all or len_test:
+            output_data_fields(fp_all_columns, all_cols, row)
             process_by_topics(seg[idx], fp_id_list, fp_data_list, fp_desc_list, fp_rank_list, row, keep_all)
         else:
             len_errs += 1
@@ -91,6 +97,30 @@ def process(seg, args):
         fp_desc.close()
 
 
+# Output all CSV columns for manual evaluation
+def output_data_fields(fp_all_columns, all_cols, row):
+    # Output all columns to file_name.cols
+    data_output = []
+    for col in all_cols:
+        value = row[col]
+        if value is not None and value != '':
+            value = re.sub('\s+', ' ', value).strip()
+            if col == 'id':
+                # Airbnb listing URL
+                info = 'https://www.airbnb.com/rooms/' + value
+            elif col == 'street':
+                info = handle_street(value)
+            elif col == 'bedrooms' or col == 'bathrooms':
+                info = handle_bedrooms_bathrooms(value, col)
+            else:
+                info = value
+            # Work around nasty Unicode bugs. Otherwise, next statement leads to UnicodeDecodeError
+            # data_output.append(info.decode('utf8'))
+            data_output.append(info)
+    data_str = ' , '.join(data_output).lower()
+    fp_all_columns.write(data_str + '\n')
+
+
 """ Entry point of processing by different topics. """
 # seg_one: sentence/word segmentation results of one property (row)
 # fp_id_list, fp_data_list, fp_desc_list, fp_rank_list: lists of file pointers
@@ -104,6 +134,11 @@ def process_by_topics(seg_one, fp_id_list, fp_data_list, fp_desc_list, fp_rank_l
 
 def build_parser():
     parser = argparse.ArgumentParser(description='Topic-specific pre-processing.')
+    parser.add_argument(
+        '-c', '--col_file',
+        required=True,
+        help='The file containing the columns to include.'
+    )
     parser.add_argument(
         '-s', '--seg_file',
         required=True,
@@ -139,11 +174,14 @@ if __name__ == '__main__':
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
 
+    print 'Reading column file %s...' % args.col_file
+    all_cols = get_cols(args.col_file)
+
     print 'Loading sentence/word segmentation results from %s...' % args.seg_file
     seg_file = open(args.seg_file, 'rb')
     seg = cPickle.load(seg_file)
     seg_file.close()
     print '  %d rows' % len(seg)
 
-    process(seg, args)
+    process(seg, all_cols, args)
 
