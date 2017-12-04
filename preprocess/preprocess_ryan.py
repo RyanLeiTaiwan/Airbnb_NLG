@@ -54,8 +54,8 @@ def process(seg, args):
         # print seg[idx]['orig_desc']
         tokens_count = count_tokens_in_seg_row(seg[idx]['orig_desc'])
         len_test = description is not None and len(description) >= MIN_DESC_CHARS and tokens_count >= MIN_DESC_TOKENS
-        if not len_test:
-            print '%s: %s' % (row['id'], description)
+        # if not len_test:
+        #     print '%s: %s' % (row['id'], description)
         if keep_all or len_test:
             process_by_topics(seg[idx], fp_id_list, fp_data_list, fp_desc_list, fp_rank_list, row, keep_all)
         else:
