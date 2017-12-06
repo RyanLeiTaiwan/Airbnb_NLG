@@ -13,7 +13,7 @@ import re
 
 
 # seg: sentence/word segmentation results by spaCy
-# all_cols: list of all columns defined in column file
+# all_cols: list of all columns defined in column file. Used only for human evaluation of test set
 def process(seg, all_cols, args):
     # Unpack command-line arguments
     in_file, output_dir, keep_all = args.input_file, args.output_dir, args.keep_all
@@ -21,7 +21,8 @@ def process(seg, all_cols, args):
     file_name = os.path.splitext(os.path.basename(in_file))[0]
 
     # Open files all in one place (three lists of file pointers)
-    fp_all_columns = open(os.path.join(output_dir, file_name + '.cols'), 'w')
+    if all_cols:
+        fp_all_columns = open(os.path.join(output_dir, file_name + '.cols'), 'w')
     fp_id_list = []
     fp_data_list = []
     fp_desc_list = []
@@ -62,7 +63,8 @@ def process(seg, all_cols, args):
         # if not len_test:
         #     print '%s: %s' % (row['id'], description)
         if keep_all or len_test:
-            output_data_fields(fp_all_columns, all_cols, row)
+            if all_cols:
+                output_data_fields(fp_all_columns, all_cols, row)
             process_by_topics(seg[idx], fp_id_list, fp_data_list, fp_desc_list, fp_rank_list, row, keep_all)
         else:
             len_errs += 1
@@ -114,8 +116,6 @@ def output_data_fields(fp_all_columns, all_cols, row):
                 info = handle_bedrooms_bathrooms(value, col)
             else:
                 info = value
-            # Work around nasty Unicode bugs. Otherwise, next statement leads to UnicodeDecodeError
-            # data_output.append(info.decode('utf8'))
             data_output.append(info)
     data_str = ' , '.join(data_output).lower()
     fp_all_columns.write(data_str + '\n')
@@ -136,8 +136,7 @@ def build_parser():
     parser = argparse.ArgumentParser(description='Topic-specific pre-processing.')
     parser.add_argument(
         '-c', '--col_file',
-        required=True,
-        help='The file containing the columns to include.'
+        help='The file containing the columns to output for human evaluation.'
     )
     parser.add_argument(
         '-s', '--seg_file',
@@ -174,8 +173,10 @@ if __name__ == '__main__':
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
 
-    print 'Reading column file %s...' % args.col_file
-    all_cols = get_cols(args.col_file)
+    all_cols = None
+    if args.col_file:
+        print 'Reading column file %s...' % args.col_file
+        all_cols = get_cols(args.col_file)
 
     print 'Loading sentence/word segmentation results from %s...' % args.seg_file
     seg_file = open(args.seg_file, 'rb')
