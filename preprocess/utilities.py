@@ -49,7 +49,7 @@ def complete_description_survey(row):
             value = getattr(row, col)
             if value is not np.nan:
                 build_string.append(value.strip())
-    return '\n\n'.join(build_string)
+    return '\n\n'.join(build_string).strip()
 
 
 # Count tokens in spaCy segmentation results of a row

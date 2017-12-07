@@ -215,4 +215,6 @@ if __name__ == '__main__':
     f_human.close()
     f_machine.close()
 
-    print 'Finished writing the ranked files to %s and %s' % (args.output_human, args.output_machine)
+    print 'Finished writing the ranked files to:'
+    print '  %s' % args.output_human
+    print '  %s' % args.output_machine

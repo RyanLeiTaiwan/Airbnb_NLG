@@ -1,5 +1,3 @@
-# TODO: Separate MMR() into MMR.py
-# TODO: Consider separating survey formatting tasks into survey_format.py
 # Diversify ranked output of multiple topics, assuming we generate N descriptions per input line
 # Algorithm: Maximum Marginal Relevance (MMR)
 # Note: Should run as a Python module at repo root directory
@@ -32,16 +30,15 @@ Merged format for human investigation:
 
 # Import our own modules
 from preprocess.selection import get_cols
-from preprocess.handle_columns import *
 from preprocess.utilities import *
 from MMR import *
+import format_survey
 # Import built-in or 3rd-party modules
 import argparse
 from string import punctuation
 import numpy as np
 import spacy
 import pandas as pd
-import re
 
 """
 Note: Run with spaCy 2.0 at the time of writing
@@ -114,37 +111,6 @@ def read_data(args):
 
     # orig.shape and nlg.shape: (#topics, #sample_per_property * #properties)
     return num_descs_per_input, survey_cols, df, np.array(orig), np.array(nlg)
-
-
-# Format columns for one CSV row as multiple lines for human investigation or human rating survey
-# Rename column names as appropriate
-"""
-Format:
-- col0: value0
-- col1: value1
-...
-"""
-def format_csv_row(survey_cols, row):
-    data_str = []
-    for col in survey_cols:
-        value = row[col]
-        value = re.sub('\s+', ' ', value).strip()
-        if col == 'id':
-            # Airbnb listing URL
-            col = 'listing'
-            info = 'https://www.airbnb.com/rooms/' + value
-        elif col == 'name':
-            col = 'title'
-            info = value
-        elif col == 'street':
-            info = handle_street(value)
-        elif col == 'neighbourhood_cleansed':
-            col = 'neighbourhood'
-            info = value
-        else:
-            info = value
-        data_str.append('- ' + col + ': ' + info)
-    return '\n'.join(data_str)
 
 
 def build_parser():
@@ -228,7 +194,7 @@ if __name__ == '__main__':
         f_survey.write('PROPERTY %03d\n' % prop)
         # Get a Pandas row by index
         row = df.iloc[prop]
-        input_str = format_csv_row(survey_cols, row)
+        input_str = format_survey.format_csv_row(survey_cols, row)
         f_human.write('[INPUT]\n%s\n\n' % input_str)
         f_survey.write('[INPUT]\n%s\n\n' % input_str)
 
@@ -257,7 +223,9 @@ if __name__ == '__main__':
                           (score_total[desc], score_orig[desc], score_dv[desc], nlg_dv[desc]))
         f_human.write('=' * 80 + '\n')
         # Separate two topics by a blank line
-        f_survey.write('\n\n'.join(nlg_dv_survey) + '\n')
+        survey_str = '\n\n'.join(nlg_dv_survey)
+        # TODO: call format_survey.format_nlg(survey_str)
+        f_survey.write(survey_str + '\n')
         f_survey.write('=' * 80 + '\n')
         f_machine.write('%s\n' % ' '.join(nlg_dv))
 
