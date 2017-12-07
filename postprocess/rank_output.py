@@ -14,9 +14,9 @@ NLG: (SCORE: total score, G: grammar, I: input information, K: keywords)
 """
 All ranking criteria and corresponding scores for each match:
 [a] Grammar:
-    [1] <unk> tokens (-3)
+    [1] <unk> tokens (-5)
     [2] Repeating non-stopword, non-punctuation tokens within 3 positions (-2)
-    [3] Default length is 20-40 non-punctuation tokens. Penalize per 5 tokens increase or 3 tokens decrease (-1)
+    [3] Default length is 20-40 non-punctuation tokens. Penalize per increase (-1/5) or decrease (-1/3)
     [4] Last token is not a punctuation (-5)
 [b] Information: match all input fields (may be multiple words) in NLG string, excluding repeats (+2)
 [c] Keywords: match pre-defined keywords as in pre-processing sentence ranking, excluding repeats (+1)
@@ -56,8 +56,6 @@ def rank_output(input, nlg_list, keywords):
 def score_grammar(nlg):
     score = 0
     toks = nlg.split(' ')
-    if nlg == 'with its great location with many restaurants':
-        print nlg
 
     # Latest token positions
     tok_pos = {}
@@ -66,9 +64,7 @@ def score_grammar(nlg):
     for pos, tok in enumerate(toks):
         # [1] Deduct 3 points per <unk>
         if tok == '<unk>':
-            if nlg == 'with its great location with many restaurants , cafes , bars and shops around the corner . minutes away from the bustling george street area , close to haymarket station , and it takes about 8 minutes to the castle , the historic university and the city center .':
-                print nlg
-            score -= 3
+            score -= 5
         if tok not in puncts:
             # Count non-punctuation tokens
             length += 1
@@ -83,11 +79,11 @@ def score_grammar(nlg):
     # [2] Deduct 2 points per repetition of non-punctuation
     score -= rep * 2
 
-    # [3] Default length is 20-40 non-punctuation tokens. Deduct 1 point per 5 tokens increase or 3 tokens decrease
-    if length <= 17:
-        score -= (20 - length) / 3
-    if length >= 45:
-        score -= (length - 40) / 5
+    # [3] Default length is 20-40 non-punctuation tokens. Deduct 1/5 per token increase or 1/3 per token decrease
+    if length < 20:
+        score -= (20 - length) / 3.0
+    if length > 40:
+        score -= (length - 40) / 5.0
 
     # [4] Last token is not a punctuation: deduct 5 points (serious)
     if toks[-1] not in puncts:
@@ -98,10 +94,9 @@ def score_grammar(nlg):
 
 # Get a information correctness score by matching all input fields, excluding repeats
 def score_info(nlg, input):
-    # Space input format: name , #bedrooms bedrooms , #bathrooms bathrooms , property_type , room_type ,
-    #   street , neighbourhood_cleansed , city , country
-    # Nearby input format: name , street , neighbourhood_cleansed , city , zipcode , country
-    info = set([s.strip() for s in input.split(',')])
+    # Format for "nearby" topic: name , street , neighbourhood_cleansed , city , zipcode , country
+    # Store input fields in a set, excluding repeats
+    info = {s.strip() for s in input.split(',')}
 
     # Search input field (boolean) in nlg string (slow) because a field may contain multiple tokens
     match = [(field in nlg) for field in info]

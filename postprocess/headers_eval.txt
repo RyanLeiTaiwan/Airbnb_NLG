@@ -1,0 +1,11 @@
+id
+name
+bedrooms
+bathrooms
+property_type
+room_type
+amenities
+street
+neighbourhood_cleansed
+city
+country
