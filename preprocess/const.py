@@ -14,10 +14,11 @@ keep_cols = [
 # In Airbnb CSV format, complete (untruncated) description
 #   = summary + space + access + interaction + neighborhood_overview + transit + notes
 desc_cols = ['summary', 'space', 'access', 'interaction', 'neighborhood_overview', 'transit', 'notes']
+desc_cols_survey = ['summary', 'space', 'neighborhood_overview', 'transit']
 # Columns with string dtype
 str_cols = desc_cols + []
 # Topics covered
-# topics = ['space', 'nearby']
+# topics = ['space', 'amenities', 'nearby', 'specific_loc', 'transit']
 topics = ['nearby']
 # Minimum number of characters in description. Otherwise, skip the property
 MIN_DESC_CHARS = 30

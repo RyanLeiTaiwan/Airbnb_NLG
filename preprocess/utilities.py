@@ -2,6 +2,7 @@
 Shared utility classes and functions
 """
 from const import *
+import numpy as np
 
 
 def incr(dic, key):
@@ -26,14 +27,29 @@ def airbnb_dtype():
     return dtype
 
 
-# Get the complete description by concatenation. row is a Pandas row using iterator
+# Get the complete description by concatenation. row is a Pandas row
 def complete_description(row):
     build_string = []
     for col in desc_cols:
         # Some cities may not have all of these columns
         if hasattr(row, col):
-            build_string.append(getattr(row, col).strip())
+            value = getattr(row, col)
+            if value is not np.nan:
+                build_string.append(value.strip())
     return ' '.join(build_string)
+
+
+# Get the complete description by concatenation used in human ratings. row is a Pandas row
+# Separate each column value with a blank line
+def complete_description_survey(row):
+    build_string = []
+    for col in desc_cols_survey:
+        # Some cities may not have all of these columns
+        if hasattr(row, col):
+            value = getattr(row, col)
+            if value is not np.nan:
+                build_string.append(value.strip())
+    return '\n\n'.join(build_string)
 
 
 # Count tokens in spaCy segmentation results of a row
