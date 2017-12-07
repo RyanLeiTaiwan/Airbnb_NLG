@@ -9,3 +9,5 @@ street
 neighbourhood_cleansed
 city
 country
+latitude
+longitude
