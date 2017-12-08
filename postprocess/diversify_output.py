@@ -32,10 +32,9 @@ Merged format for human investigation:
 from preprocess.selection import get_cols
 from preprocess.utilities import *
 from MMR import *
-import format_survey
+from format_survey import *
 # Import built-in or 3rd-party modules
 import argparse
-from string import punctuation
 import numpy as np
 import spacy
 import pandas as pd
@@ -47,9 +46,9 @@ https://spacy.io/docs/usage/models
 """
 model = 'en_core_web_lg'
 # model = 'en_core_web_md'
-puncts = set(punctuation)
 
 # Diversification parameters
+# TODO: Remove hard coding
 max_descs_per_topic = [2, 1, 2, 2, 2]
 idx_topic_name = set([0] + list(np.cumsum(max_descs_per_topic)[:-1]))
 
@@ -153,21 +152,27 @@ def build_parser():
         help='Output merged file for human rating surveys'
     )
     parser.add_argument(
+        '-sim', '--similarity',
+        required=True,
+        help='The method for similarity computation [vector|jaccard]'
+    )
+    parser.add_argument(
         '-l', '--w_lambda',
         type=float,
-        required=True,
+        default=0.5,
         help='Parameter lambda in MMR algorithm'
+    )
+    parser.add_argument(
+        '-thr', '--MMR_thr',
+        type=float,
+        default=-np.inf,
+        help='MMR score threshold to add a new description'
     )
     parser.add_argument(
         '-max', '--max_words',
         type=int,
-        required=True,
+        default=250,
         help='Maximum number of non-puctuation tokens'
-    )
-    parser.add_argument(
-        '-sim', '--similarity',
-        required=True,  
-        help='The method for similarity computation'
     )
     return parser
 
@@ -176,24 +181,28 @@ if __name__ == '__main__':
     parser = build_parser()
     args = parser.parse_args()
 
-    # input: a Pandas DataFrame
+    # df: a Pandas DataFrame (test set CSV)
     # orig.shape and nlg.shape: (#topics, #sample_per_property * #properties)
     num_descs_per_input, survey_cols, df, orig, nlg = read_data(args)
 
-    print 'Loading spaCy model %s...' % model
-    nlp = spacy.load(model)
+    sim_metric = args.similarity
+    print 'Using %s for similarity computation' % sim_metric
+
+    nlp = None
+    if sim_metric == 'vector':
+        print 'Loading spaCy model %s...' % model
+        nlp = spacy.load(model)
 
     print 'Diversifying NLG output descriptions...'
     f_human = open(args.output_human, 'w')
     f_machine = open(args.output_machine, 'w')
     f_survey = open(args.output_survey, 'w')
 
-    print("Using %s for similarity computation" % args.similarity)
 
     # For each property
     for prop in range(df.shape[0]):
         # Debug for a few properties only
-        if prop == 10:
+        if prop == 50:
             break
 
         if (prop + 1) % 10 == 0:
@@ -202,7 +211,7 @@ if __name__ == '__main__':
         f_survey.write('PROPERTY %03d\n' % prop)
         # Get a Pandas row by index
         row = df.iloc[prop]
-        input_str = format_survey.format_csv_row(survey_cols, row)
+        input_str = format_csv_row(survey_cols, row)
         f_human.write('[INPUT]\n%s\n\n' % input_str)
         f_survey.write('[INPUT]\n%s\n\n' % input_str)
 
@@ -232,8 +241,7 @@ if __name__ == '__main__':
         f_human.write('=' * 80 + '\n')
         # Separate two topics by a blank line
         survey_str = '\n\n'.join(nlg_dv_survey)
-        # TODO: call format_survey.format_nlg(survey_str)
-        f_survey.write(survey_str + '\n')
+        f_survey.write(format_nlg(survey_str) + '\n')
         f_survey.write('=' * 80 + '\n')
         f_machine.write('%s\n' % ' '.join(nlg_dv))
 
