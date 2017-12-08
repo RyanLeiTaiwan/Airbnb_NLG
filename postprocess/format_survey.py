@@ -1,5 +1,6 @@
 # All functions related to formatting the text for easy Google Form copy and paste
 from preprocess.handle_columns import *
+import re
 
 # Format columns for one CSV row as multiple lines for human investigation or human rating survey
 # Rename column names as appropriate
@@ -47,5 +48,14 @@ short walking distance to the diego zoo , 15 miles to old town , 15 min to pacif
 
 there are two major rail lines ( arcadia and san diego blvd bus stations nearby straight in 20 minutes ) , the is located in a great neighborhood nestled at a backyard . cable car , public car rtd bus nearby , including bus lines , trolley stations , restaurants , coffee shops , easy parking , safe and roomy friendly family .
 """
-def format_nlg(nlg):
-    pass
+def format_nlg(s):
+    s = s[0].upper() + s[1:]
+    s = re.sub(r'\( +', '(', s)
+    s = re.sub(r' +\)', ')', s)
+    s = re.sub(r' +,', ',', s)
+    s = re.sub(r' +\.', '.', s)
+    s = re.sub(r' +\?', '?', s)
+    s = re.sub(r' +\!', '!', s)
+    p = re.compile(r'(?<=[\.\?!]\s)(\w+)')
+    s = p.sub(lambda x: x.group().capitalize(), s)
+    return s
