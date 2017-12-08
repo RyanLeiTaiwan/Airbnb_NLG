@@ -161,13 +161,13 @@ def build_parser():
     parser.add_argument(
         '-max', '--max_words',
         type=int,
-        required=True,
+        default=250,
         help='Maximum number of non-puctuation tokens'
     )
     parser.add_argument(
         '-sim', '--similarity',
-        required=True,  
-        help='The method for similarity computation'
+        required=True,
+        help='The method for similarity computation [vector|jaccard]'
     )
     return parser
 
@@ -176,25 +176,29 @@ if __name__ == '__main__':
     parser = build_parser()
     args = parser.parse_args()
 
-    # input: a Pandas DataFrame
+    # df: a Pandas DataFrame (test set CSV)
     # orig.shape and nlg.shape: (#topics, #sample_per_property * #properties)
     num_descs_per_input, survey_cols, df, orig, nlg = read_data(args)
 
-    print 'Loading spaCy model %s...' % model
-    nlp = spacy.load(model)
+    sim_metric = args.similarity
+    print 'Using %s for similarity computation' % sim_metric
+
+    nlp = None
+    if sim_metric == 'vector':
+        print 'Loading spaCy model %s...' % model
+        nlp = spacy.load(model)
 
     print 'Diversifying NLG output descriptions...'
     f_human = open(args.output_human, 'w')
     f_machine = open(args.output_machine, 'w')
     f_survey = open(args.output_survey, 'w')
 
-    print("Using %s for similarity computation" % args.similarity)
 
     # For each property
     for prop in range(df.shape[0]):
         # Debug for a few properties only
-        if prop == 10:
-            break
+        # if prop == 10:
+        #     break
 
         if (prop + 1) % 10 == 0:
             print '  %d properties' % (prop + 1)
