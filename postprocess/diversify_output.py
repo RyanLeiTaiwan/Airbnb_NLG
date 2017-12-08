@@ -35,7 +35,6 @@ from MMR import *
 import format_survey
 # Import built-in or 3rd-party modules
 import argparse
-from string import punctuation
 import numpy as np
 import spacy
 import pandas as pd
@@ -47,9 +46,9 @@ https://spacy.io/docs/usage/models
 """
 model = 'en_core_web_lg'
 # model = 'en_core_web_md'
-puncts = set(punctuation)
 
 # Diversification parameters
+# TODO: Remove hard coding
 max_descs_per_topic = [2, 1, 2, 2, 2]
 idx_topic_name = set([0] + list(np.cumsum(max_descs_per_topic)[:-1]))
 
@@ -153,21 +152,27 @@ def build_parser():
         help='Output merged file for human rating surveys'
     )
     parser.add_argument(
+        '-sim', '--similarity',
+        required=True,
+        help='The method for similarity computation [vector|jaccard]'
+    )
+    parser.add_argument(
         '-l', '--w_lambda',
         type=float,
-        required=True,
+        default=0.5,
         help='Parameter lambda in MMR algorithm'
+    )
+    parser.add_argument(
+        '-thr', '--MMR_thr',
+        type=float,
+        default=-np.inf,
+        help='MMR score threshold to add a new description'
     )
     parser.add_argument(
         '-max', '--max_words',
         type=int,
         default=250,
         help='Maximum number of non-puctuation tokens'
-    )
-    parser.add_argument(
-        '-sim', '--similarity',
-        required=True,
-        help='The method for similarity computation [vector|jaccard]'
     )
     return parser
 
@@ -197,8 +202,8 @@ if __name__ == '__main__':
     # For each property
     for prop in range(df.shape[0]):
         # Debug for a few properties only
-        # if prop == 10:
-        #     break
+        if prop == 50:
+            break
 
         if (prop + 1) % 10 == 0:
             print '  %d properties' % (prop + 1)
