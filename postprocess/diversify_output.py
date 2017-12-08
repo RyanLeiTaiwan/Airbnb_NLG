@@ -157,6 +157,10 @@ def build_parser():
         help='The method for similarity computation [vector|jaccard]'
     )
     parser.add_argument(
+        '-shf', '--shuffle',
+        help='Shuffle order file for one configuration'
+    )
+    parser.add_argument(
         '-l', '--w_lambda',
         type=float,
         default=0.5,
@@ -198,15 +202,23 @@ if __name__ == '__main__':
     f_machine = open(args.output_machine, 'w')
     f_survey = open(args.output_survey, 'w')
 
+    # a) Default forward order: 0, 1, ..., 999
+    if not args.shuffle:
+        prop_order = range(df.shape[0])
+    # b) Survey shuffled and sorted order: 23, 44, 61, ...
+    else:
+        with open(args.shuffle, 'r') as f:
+            # Get the integer before space
+            prop_order = [int(p.split(' ')[0]) for p in f.read().splitlines()]
 
+    prop_count = 0
     # For each property
-    for prop in range(df.shape[0]):
+    for prop in prop_order:
+        prop_count += 1
         # Debug for a few properties only
         # if prop == 10:
         #     break
 
-        if (prop + 1) % 10 == 0:
-            print '  %d properties' % (prop + 1)
 
         f_survey.write('PROPERTY %03d\n' % prop)
         # Get a Pandas row by index
@@ -244,6 +256,10 @@ if __name__ == '__main__':
         f_survey.write(format_nlg(survey_str) + '\n')
         f_survey.write('=' * 80 + '\n')
         f_machine.write('%s\n' % ' '.join(nlg_dv))
+
+        # Print progress
+        if prop_count % 10 == 0:
+            print '  %d properties' % (prop_count)
 
     f_human.close()
     f_machine.close()
