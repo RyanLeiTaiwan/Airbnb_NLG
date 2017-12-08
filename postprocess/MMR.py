@@ -3,7 +3,8 @@ from string import punctuation
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 from scipy.spatial.distance import pdist, squareform
-
+from nltk.stem.wordnet import WordNetLemmatizer
+import string
 
 puncts = set(punctuation)
 
@@ -134,15 +135,23 @@ def min_max_normalize(X):
 
 def compute_jaccard(nlg, num_descs):
     jaccard_sim = []
-    # TODO: Remove punctuation and perform lemmatization
+    wnl = WordNetLemmatizer()
+    nlg_tokens = []
+    # remove punctuation
+    for idx in range(num_descs):
+        doc = nlg[idx].strip()
+        doc = "".join(l for l in doc if l not in string.punctuation).decode('utf8')
+        tokens = set([wnl.lemmatize(i) for i in doc.split()])
+        nlg_tokens.append(tokens)
+
     for first_doc in range(num_descs):
         for second_doc in range(first_doc+1, num_descs):
-            doc1 = set(nlg[first_doc].split())
-            doc2 = set(nlg[second_doc].split())
+            doc1 = nlg_tokens[first_doc]
+            doc2 = nlg_tokens[second_doc]
             intersect = doc1.intersection(doc2)
             union = doc1.union(doc2)
             if len(union) == 0:
-                score = 0
+                score = 1.0
                 print 'len(union) == 0'
                 print first_doc
                 print second_doc
