@@ -202,8 +202,8 @@ if __name__ == '__main__':
     # For each property
     for prop in range(df.shape[0]):
         # Debug for a few properties only
-        if prop == 50:
-            break
+        # if prop == 10:
+        #     break
 
         if (prop + 1) % 10 == 0:
             print '  %d properties' % (prop + 1)
