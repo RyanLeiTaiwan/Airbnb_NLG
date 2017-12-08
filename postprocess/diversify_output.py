@@ -32,7 +32,7 @@ Merged format for human investigation:
 from preprocess.selection import get_cols
 from preprocess.utilities import *
 from MMR import *
-import format_survey
+from format_survey import *
 # Import built-in or 3rd-party modules
 import argparse
 import numpy as np
@@ -211,7 +211,7 @@ if __name__ == '__main__':
         f_survey.write('PROPERTY %03d\n' % prop)
         # Get a Pandas row by index
         row = df.iloc[prop]
-        input_str = format_survey.format_csv_row(survey_cols, row)
+        input_str = format_csv_row(survey_cols, row)
         f_human.write('[INPUT]\n%s\n\n' % input_str)
         f_survey.write('[INPUT]\n%s\n\n' % input_str)
 
@@ -241,8 +241,7 @@ if __name__ == '__main__':
         f_human.write('=' * 80 + '\n')
         # Separate two topics by a blank line
         survey_str = '\n\n'.join(nlg_dv_survey)
-        # TODO: call format_survey.format_nlg(survey_str)
-        f_survey.write(survey_str + '\n')
+        f_survey.write(format_nlg(survey_str) + '\n')
         f_survey.write('=' * 80 + '\n')
         f_machine.write('%s\n' % ' '.join(nlg_dv))
 
