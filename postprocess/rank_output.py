@@ -54,7 +54,7 @@ def rank_output(input, nlg_list, keywords, grammar_weight):
 
 # Get a grammar score by several language criteria
 def score_grammar(nlg):
-    score = 0
+    score = 0.0
     toks = nlg.split(' ')
 
     # Latest token positions
@@ -64,7 +64,7 @@ def score_grammar(nlg):
     for pos, tok in enumerate(toks):
         # [1] Deduct 3 points per <unk>
         if tok == '<unk>':
-            score -= 5
+            score -= 5.0
         if tok not in puncts:
             # Count non-punctuation tokens
             length += 1
@@ -77,7 +77,7 @@ def score_grammar(nlg):
                 tok_pos[tok] = pos
 
     # [2] Deduct 2 points per repetition of non-punctuation
-    score -= rep * 2
+    score -= rep * 2.0
 
     # [3] Default length is 20-40 non-punctuation tokens. Deduct 1/5 per token increase or 1/3 per token decrease
     if length < 20:
@@ -101,7 +101,7 @@ def score_info(nlg, input):
     # Search input field (boolean) in nlg string (slow) because a field may contain multiple tokens
     match = [(field in nlg) for field in info]
     # Sum boolean values. Info weight: 2
-    return sum(match) * 2
+    return float(sum(match) * 2)
 
 
 # Get a keyword score for a description by matching the pre-defined keyword dictionary, excluding repeats
@@ -113,7 +113,7 @@ def score_keyword(nlg, keywords):
         if tok in keywords:
             match.add(tok)
     # Keyword weight: 1
-    return len(match)
+    return float(len(match))
 
 
 def build_parser():
@@ -143,6 +143,7 @@ def build_parser():
     )
     parser.add_argument(
 	'-g', '--grammar_weight',
+    type=float,
 	default=1.0,
 	help='Weight on the grammar score'
     )
@@ -207,14 +208,14 @@ if __name__ == '__main__':
         nlg_list = nlg[nlg_lines_per_input * prop : nlg_lines_per_input * (prop + 1)]
         # Call the ranking function
         score, grammar, info, keyword, nlg_ranked = \
-            rank_output(input[prop], nlg_list, keywords, float(args.grammar_weight))
+            rank_output(input[prop], nlg_list, keywords, args.grammar_weight)
 
         # For each description in ranked results
         for desc in range(nlg_lines_per_input):
-            f_human.write('[SCORE: %2d, G: %2d, I: %2d, K: %2d] %s\n' %
+            f_human.write('[SCORE: %.1f, G: %.1f, I: %2d, K: %2d] %s\n' %
                           (score[desc], grammar[desc], info[desc], keyword[desc], nlg_ranked[desc]))
             # Machine output format: "score nlg_description"
-            f_machine.write('%d %s\n' % (score[desc], nlg_ranked[desc]))
+            f_machine.write('%.1f %s\n' % (score[desc], nlg_ranked[desc]))
         f_human.write('=' * 80 + '\n')
 
     f_human.close()
