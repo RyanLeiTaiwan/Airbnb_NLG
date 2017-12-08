@@ -164,6 +164,11 @@ def build_parser():
         required=True,
         help='Maximum number of non-puctuation tokens'
     )
+    parser.add_argument(
+        '-sim', '--similarity',
+        required=True,  
+        help='The method for similarity computation'
+    )
     return parser
 
 
@@ -182,6 +187,9 @@ if __name__ == '__main__':
     f_human = open(args.output_human, 'w')
     f_machine = open(args.output_machine, 'w')
     f_survey = open(args.output_survey, 'w')
+
+    print("Using %s for similarity computation" % args.similarity)
+
     # For each property
     for prop in range(df.shape[0]):
         # Debug for a few properties only
