@@ -35,14 +35,14 @@ wordnet = WordNetLemmatizer()
 
 # Rank output per property
 # nlg_list: list of nlg_lines_per_input descriptions
-def rank_output(input, nlg_list, keywords):
+def rank_output(input, nlg_list, keywords, grammar_weight):
     num_desc = len(nlg_list)
     grammar = np.zeros(num_desc)
     info = np.zeros(num_desc)
     keyword = np.zeros(num_desc)
 
     for desc in range(num_desc):
-        grammar[desc] = score_grammar(nlg_list[desc])
+        grammar[desc] = grammar_weight * score_grammar(nlg_list[desc])
         info[desc] = score_info(nlg_list[desc], input)
         keyword[desc] = score_keyword(nlg_list[desc], keywords)
 
@@ -142,6 +142,11 @@ def build_parser():
         help='Topic name (amenity, nearby, transit)'
     )
     parser.add_argument(
+	'-g', '--grammar_weight',
+	default=1.0,
+	help='Weight on the grammar score'
+    )
+    parser.add_argument(
         '-oh', '--output_human',
         required=True,
         help='Output merged file for human investigation'
@@ -202,7 +207,7 @@ if __name__ == '__main__':
         nlg_list = nlg[nlg_lines_per_input * prop : nlg_lines_per_input * (prop + 1)]
         # Call the ranking function
         score, grammar, info, keyword, nlg_ranked = \
-            rank_output(input[prop], nlg_list, keywords)
+            rank_output(input[prop], nlg_list, keywords, float(args.grammar_weight))
 
         # For each description in ranked results
         for desc in range(nlg_lines_per_input):
