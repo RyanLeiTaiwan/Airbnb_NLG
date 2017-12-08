@@ -40,7 +40,6 @@ def MMR_algo(orig_mat, nlg_mat, max_descs_per_topic, nlp, args):
 
     # Convert descriptions into spaCy's 300-dim Doc vectors
     if args.similarity == "vector":
-        # print("Using word2vec for similarity computation")
         doc_vec = np.zeros((num_descs, 300))
         for doc in range(num_descs):
             doc_vec[doc, :] = nlp(nlg[doc].decode('utf8')).vector
@@ -48,7 +47,6 @@ def MMR_algo(orig_mat, nlg_mat, max_descs_per_topic, nlp, args):
         # Compute pairwise cosine similarity between the Doc vectors. sim = 1 - dist
         sim = 1.0 - squareform(pdist(doc_vec, metric='cosine'))
     else:
-        # print("Using jaccard for similarity computation")
         # nlg: (num_descs, )
         # jaccard_sim: (n(n-1)/2, )   n=num_descs
         jaccard_sim = compute_jaccard(nlg, num_descs)   
@@ -112,6 +110,7 @@ def min_max_normalize(X):
     X_max = np.max(X)
     return (X - X_min) / (X_max - X_min)
 
+
 def compute_jaccard(nlg, num_descs):
     jaccard_sim = []
     for first_doc in range(num_descs):
@@ -119,7 +118,14 @@ def compute_jaccard(nlg, num_descs):
             doc1 = set(nlg[first_doc].split())
             doc2 = set(nlg[second_doc].split())
             intersect = doc1.intersection(doc2)
-            score = float(len(intersect)) / (len(doc1) + len(doc2) - len(intersect))
+            len_union = len(doc1) + len(doc2) - len(intersect)
+            if len_union == 0:
+                score = 0
+                print 'len(union) == 0'
+                print first_doc
+                print second_doc
+            else:
+                score = float(len(intersect)) / float(len_union)
             jaccard_sim.append(score)
 
     assert len(jaccard_sim) == num_descs*(num_descs-1)/2, "The length of jaccard_sim array is not correct."
