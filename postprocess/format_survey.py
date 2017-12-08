@@ -58,6 +58,6 @@ def format_nlg(s):
     s = re.sub(r' +\!', '!', s)
     s = re.sub(r' +\'', '\'', s)
     s = re.sub(r' +:', ':', s)
-    p = re.compile(r'(?<=[\.\?!]\s)(\w+)')
+    p = re.compile(r'(?<=[\.\?!\n]\s)(\w+)')
     s = p.sub(lambda x: x.group().capitalize(), s)
     return s
