@@ -4,7 +4,6 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 from scipy.spatial.distance import pdist, squareform
 from nltk.stem.wordnet import WordNetLemmatizer
-import string
 
 puncts = set(punctuation)
 
@@ -140,7 +139,7 @@ def compute_jaccard(nlg, num_descs):
     # remove punctuation
     for idx in range(num_descs):
         doc = nlg[idx].strip()
-        doc = "".join(l for l in doc if l not in string.punctuation).decode('utf8')
+        doc = ''.join(l for l in doc if l not in puncts).decode('utf8')
         tokens = set([wnl.lemmatize(i) for i in doc.split()])
         nlg_tokens.append(tokens)
 
@@ -159,5 +158,5 @@ def compute_jaccard(nlg, num_descs):
                 score = float(len(intersect)) / float(len(union))
             jaccard_sim.append(score)
 
-    assert len(jaccard_sim) == num_descs*(num_descs-1)/2, "The length of jaccard_sim array is not correct."
+    assert len(jaccard_sim) == num_descs*(num_descs-1)/2, 'The length of jaccard_sim array is not correct.'
     return np.asarray(jaccard_sim)
