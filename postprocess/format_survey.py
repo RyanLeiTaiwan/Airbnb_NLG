@@ -15,11 +15,7 @@ def format_csv_row(survey_cols, row):
     for col in survey_cols:
         value = row[col]
         value = re.sub('\s+', ' ', value).strip()
-        if col == 'id':
-            # Airbnb listing URL
-            col = 'listing'
-            info = 'https://www.airbnb.com/rooms/' + value
-        elif col == 'name':
+        if col == 'name':
             col = 'title'
             info = value
         elif col == 'street':
