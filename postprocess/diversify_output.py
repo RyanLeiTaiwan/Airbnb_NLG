@@ -38,6 +38,7 @@ import argparse
 import numpy as np
 import spacy
 import pandas as pd
+import re
 
 """
 Note: Run with spaCy 2.0 at the time of writing
@@ -161,6 +162,12 @@ def build_parser():
         help='Shuffle order file for one configuration'
     )
     parser.add_argument(
+        '-ref', '--ref_mode',
+        default=False,
+        action='store_true',
+        help='Output survey and machine formats in reference-only mode'
+    )
+    parser.add_argument(
         '-l', '--w_lambda',
         type=float,
         default=0.5,
@@ -189,6 +196,9 @@ if __name__ == '__main__':
     # orig.shape and nlg.shape: (#topics, #sample_per_property * #properties)
     num_descs_per_input, survey_cols, df, orig, nlg = read_data(args)
 
+    ref_mode = args.ref_mode
+    if ref_mode:
+        print 'Running in "reference mode" for survey and machine formats...'
     sim_metric = args.similarity
     print 'Using %s for similarity computation' % sim_metric
 
@@ -219,7 +229,6 @@ if __name__ == '__main__':
         # if prop == 10:
         #     break
 
-
         f_survey.write('PROPERTY %03d\n' % prop)
         # Get a Pandas row by index
         row = df.iloc[prop]
@@ -230,9 +239,12 @@ if __name__ == '__main__':
         # Each topic as a paragraph
         description_str = complete_description_survey(row)
         f_human.write('[REF]\n%s\n\n' % description_str)
-        f_survey.write('[REF]\n%s\n\n' % description_str)
+        f_survey.write('[REF]\n%s\n' % description_str)
+        if not ref_mode:
+            f_survey.write('\n')
         f_human.write('[NLG]\n')
-        f_survey.write('[NLG]\n')
+        if not ref_mode:
+            f_survey.write('[NLG]\n')
 
         idx_slice = range(num_descs_per_input * prop, num_descs_per_input * (prop + 1))
         orig_mat = orig[:, idx_slice]
@@ -251,11 +263,18 @@ if __name__ == '__main__':
             f_human.write('[SCORE: %.3f, O: %.3f, D: %.3f] %s\n' %
                           (score_total[desc], score_orig[desc], score_dv[desc], nlg_dv[desc]))
         f_human.write('=' * 80 + '\n')
-        # Separate two topics by a blank line
-        survey_str = '\n\n'.join(nlg_dv_survey)
-        f_survey.write(format_nlg(survey_str) + '\n')
+
+        if not ref_mode:
+            # Separate two topics by a blank line
+            survey_str = '\n\n'.join(nlg_dv_survey)
+            f_survey.write(format_nlg(survey_str) + '\n')
         f_survey.write('=' * 80 + '\n')
-        f_machine.write('%s\n' % ' '.join(nlg_dv))
+
+        if ref_mode:
+            # Merge into one line
+            f_machine.write('%s\n' % re.sub('\s+', ' ', description_str))
+        else:
+            f_machine.write('%s\n' % ' '.join(nlg_dv))
 
         # Print progress
         if prop_count % 10 == 0:
