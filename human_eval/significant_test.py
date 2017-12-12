@@ -6,19 +6,44 @@ Using default configuration as the control group,
 import os
 import numpy as np
 import pandas as pd
-from scipy import stats
+from scipy.stats import ttest_ind
 
 PROPS_PER_ROW = 10
 NUM_QUESTIONS = 6
 NUM_CONFIGS = 6
 
 
+# Report the means of each (config, question)
+def report_means(configs):
+    assert len(configs) == NUM_CONFIGS
+    [reference, default, grammar, w_lambda, threshold, jaccard] = configs
+    print '=' * 80
+    print '[mean scores]'
+    print 'default: %s' % np.mean(default, axis=0)
+    print 'grammar: %s' % np.mean(grammar, axis=0)
+    print 'lambda: %s' % np.mean(w_lambda, axis=0)
+    print 'threshold: %s' % np.mean(threshold, axis=0)
+    print 'jaccard: %s' % np.mean(jaccard, axis=0)
+    print 'reference: %s' % np.mean(reference, axis=0)
+
+
+# Two-sample T-tests between default vs. other configs or reference
+# configs: list of #configs Numpy arrays of shape (#properties in this config, #questions=6)
+def run_t_tests(configs):
+    assert len(configs) == NUM_CONFIGS
+    [reference, default, grammar, w_lambda, threshold, jaccard] = configs
+    print '=' * 80
+    print '[T-tests] two-tailed p-values'
+    print 'grammar: %s' % ttest_ind(default, grammar, equal_var=False).pvalue
+    print 'lambda: %s' % ttest_ind(default, w_lambda, equal_var=False).pvalue
+    print 'threshold: %s' % ttest_ind(default, threshold, equal_var=False).pvalue
+    print 'jaccard: %s' % ttest_ind(default, jaccard, equal_var=False).pvalue
+    print 'reference: %s' % ttest_ind(default, reference, equal_var=False).pvalue
+
+
 if __name__ == '__main__':
     # Only the Config ID is meaningful, not the Property ID
     shuffle = np.loadtxt('shuffle.txt', dtype=int)[:, 1]
-    # Dict: config ID -> count
-    # TODO: just for verification, to be removed
-    conf_count = dict()
 
     # Read CSVs and organize into #configs Numpy arrays of shape (#properties in this config, #questions=6)
     # Each element of configs will be a Numpy array
@@ -52,8 +77,6 @@ if __name__ == '__main__':
             # Shuffle indices corresponding to current row
             cur_idx_shuffle = range((csv_id - 1) * PROPS_PER_ROW, csv_id * PROPS_PER_ROW)
             print shuffle[cur_idx_shuffle]
-            for conf in shuffle[cur_idx_shuffle]:
-                conf_count[conf] = conf_count.get(conf, 0) + 1
 
             # CSV columns: Timestamp, Name, Affiliation, [Q1, ..., Q6, comment] * 10, feedback
             # For each property, starting at its Q1 column index
@@ -82,10 +105,7 @@ if __name__ == '__main__':
     for conf in range(NUM_CONFIGS):
         configs[conf] = np.array(configs[conf])
         print 'config %d: %d properties' % (conf + 1, configs[conf].shape[0])
-    # TODO: just for verification, to be removed
-    print conf_count
-
 
     # Do whatever you want with these 6 Numpy arrays of shape (#properties in this config, #questions=6)
-    pass
-
+    report_means(configs)
+    run_t_tests(configs)
