@@ -18,10 +18,14 @@ for candi_raw in candidates:
 	list_of_candidates.append(candi_raw)
 	cnt += 1
 
+print cnt
+
 for ref_raw in refs:
 	ref_raw = ref_raw.decode('utf-8').strip()
 	ref_raw = word_tokenize(ref_raw)
 	list_of_references.append(ref_raw)
+
+print cnt
 
 lists_of_references = [[ref] for ref in list_of_references]
 
