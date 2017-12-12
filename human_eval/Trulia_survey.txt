@@ -1,0 +1,12 @@
+For each location description, rate the following questions: 
+Rate 1(Disagree) To 5 (Agree)
+
+1. This description is grammatically correct.
+2. This description is too repetitive. 
+3. This description is well-structured and each sentence builds upon the previous sentence. 
+4. This description provides me with enough information about what it’s like to live in Kansas City, KS. 
+5. This description is professionally written
+6. This description is too long.
+
+
+On Mturk, each person is required to at least 3 descriptions, and we collect ~300 data points. We also did a similar test on internal Trulia users. 
