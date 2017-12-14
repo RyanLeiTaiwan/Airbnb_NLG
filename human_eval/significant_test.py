@@ -7,10 +7,15 @@ import os
 import numpy as np
 import pandas as pd
 from scipy.stats import ttest_ind
+from datetime import datetime
 
+# Constants
+CSV_DIR = 'response_csv'
+CSV_FILENAME_PREFIX = 'All Survey Responses - Survey '
 PROPS_PER_ROW = 10
 NUM_QUESTIONS = 6
 NUM_CONFIGS = 6
+TIMESTAMP_FORMAT = '%m/%d/%Y %H:%M:%S'
 
 
 # Report the means of each (config, question)
@@ -57,12 +62,14 @@ if __name__ == '__main__':
     affiliation = dict()
     # Dict: affiliation -> count
     aff_count = dict()
+    last_response_str = '1/1/2017 00:00:00'
+    last_response_datetime = datetime.strptime(last_response_str, TIMESTAMP_FORMAT)
 
     while csv_id <= 30:
         # Treat everything as a string and convert into float later
-        df = pd.read_csv(os.path.join('response_csv', '%d.csv' % csv_id), dtype=str)
+        df = pd.read_csv(os.path.join(CSV_DIR, '%s%d.csv' % (CSV_FILENAME_PREFIX, csv_id)), dtype=str)
         nrows, ncols = df.shape
-        print '%d.csv: %d rows' % (csv_id, nrows)
+        print '%s%d.csv: %d rows' % (CSV_FILENAME_PREFIX, csv_id, nrows)
         total_nrows += nrows
 
         df.replace('1 - Strongly Disagree', '1', inplace=True)
@@ -73,6 +80,10 @@ if __name__ == '__main__':
             people.add(name)
             aff = df_row['Your Affiliation']
             affiliation[name] = aff
+            timestamp = datetime.strptime(df_row['Timestamp'], TIMESTAMP_FORMAT)
+            if timestamp > last_response_datetime:
+                last_response_datetime = timestamp
+                last_response_str = df_row['Timestamp']
 
             # Shuffle indices corresponding to current row
             cur_idx_shuffle = range((csv_id - 1) * PROPS_PER_ROW, csv_id * PROPS_PER_ROW)
@@ -92,6 +103,8 @@ if __name__ == '__main__':
     print '=' * 80
     print 'Total: %d rows' % (total_nrows)
     total_nprops = total_nrows * PROPS_PER_ROW
+
+    print 'Last response: %s' % last_response_str
 
     print 'People: %s' % people
     print '%d properties rated by %d participants => %.1f rated property per person' % \
