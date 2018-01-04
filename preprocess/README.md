@@ -1,4 +1,4 @@
-<h1>Common Data Pre-processing Steps</h1>
+<h1>Data Preprocessing Steps</h1>
 <h3> Step 0: Convert all end-of-line characters into unix "LF" format</h3>
 
 - This is critical because some rare MacOS 9 "CR" chars cause *unintentional* new lines by Pandas `df.to_csv()`
@@ -39,12 +39,14 @@
   - `python2 segmentation.py -i data_csv/preprocess/dev.csv -o data_csv/preprocess/spacy_dev.pickle`
   - `python2 segmentation.py -i data_csv/preprocess/test.csv -o data_csv/preprocess/spacy_test.pickle`
 
-<h3> Step 6.1: Run the pre-processing scripts of various sentence ranking methods / topics</h3>
+<h3> Step 6.1: Run pre-processing scripts of various sentence ranking methods / topics</h3>
 
 - The script may use the pre-run spaCy segmentation results to speed up
 - The output are txt files used by NMT model containing at least input (.data) and target output (.desc)
 
-<h3> Step 6.2: Run the vocab generation script (NO LONGER AVAILABLE due to refactoring)</h3>
+<h3> Step 6.2: Run vocab generation script (NO LONGER AVAILABLE due to refactoring)</h3>
 
 - Step 6.2 is independent of Step 6.1.
 - For now, use the existing vocab files in `generated_vocab` directory (tokens with >= 15 occurrences in the dataset)
+
+<h2> By now, preprocessing should generate everything needed to run NMT (seq2seq) models</h2>
