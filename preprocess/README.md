@@ -23,8 +23,8 @@
 
 <h3> Step 4: Shuffle and split data into train/dev/test sets.</h3>
 
-- Specify the number of rows in dev and test sets. Then, training set will have all the remaining rows.
-- Output file names are hard-coded as `train.csv`, `dev.csv`, `test.csv` under OUTPUT_DIR.
+- Specify the number of rows in dev and test sets. Then, training set will have all the remaining rows
+- Output file names are hard-coded as `train.csv`, `dev.csv`, `test.csv` under OUTPUT_DIR
 - `python2 shuffle_split.py -i INPUT_FILE -o OUTPUT_DIR -d DEV_SIZE -t TEST_SIZE`
 - Example: `python2 shuffle_split.py -i data_csv/preprocess/all.csv -o data_csv/preprocess -d 1000 -t 1000`
 
@@ -32,14 +32,19 @@
 
 - Need to install `spaCy` package and a language model (en_core_web_lg recommended). https://spacy.io/usage/
   - `sudo pip2 install spaCy; sudo python2 -m spacy download en_core_web_lg`
-- See `spacy_sample.json` for output object structure. The actual output is in the pickle format.
+- See `spacy_sample.json` for output object structure. The actual output is in the pickle format
 - `python2 shuffle_split.py -i INPUT_FILE -o OUTPUT_DIR -d DEV_SIZE -t TEST_SIZE`
 - Example:
   - `python2 segmentation.py -i data_csv/preprocess/train.csv -o data_csv/preprocess/spacy_train.pickle`
   - `python2 segmentation.py -i data_csv/preprocess/dev.csv -o data_csv/preprocess/spacy_dev.pickle`
   - `python2 segmentation.py -i data_csv/preprocess/test.csv -o data_csv/preprocess/spacy_test.pickle`
 
-<h3> Step 6: Run the individual pre-processing scripts of various sentence ranking methods.</h3>
+<h3> Step 6.1: Run the pre-processing scripts of various sentence ranking methods / topics</h3>
 
 - The script may use the pre-run spaCy segmentation results to speed up
 - The output are txt files used by NMT model containing at least input (.data) and target output (.desc)
+
+<h3> Step 6.2: Run the vocab generation script (NO LONGER AVAILABLE due to refactoring)</h3>
+
+- Step 6.2 is independent of Step 6.1.
+- For now, use the existing vocab files in `generated_vocab` directory (tokens with >= 15 occurrences in the dataset)
