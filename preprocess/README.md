@@ -1,4 +1,6 @@
 <h1>Data Preprocessing Steps</h1>
+<h3>We downloaded the csv data of Airbnb from (http://insideairbnb.com/get-the-data.html).</h3>
+
 <h3> Step 0: Convert all end-of-line characters into unix "LF" format</h3>
 
 - This is critical because some rare MacOS 9 "CR" chars cause *unintentional* new lines by Pandas `df.to_csv()`
