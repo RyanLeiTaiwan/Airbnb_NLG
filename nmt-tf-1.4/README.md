@@ -1,6 +1,6 @@
 # Neural Machine Translation (seq2seq) Tutorial
 
-Original post at (https://github.com/tensorflow/nmt/tree/tf-1.4)
+Original tutorial at (https://github.com/tensorflow/nmt/tree/tf-1.4)
 
 In our project, this seq2seq model is used to generate descriptions for each topic. We split the tutorial to <b>Train</b>, <b>Inference</b>, <b>Generate Multiple</b>.
 
@@ -32,10 +32,10 @@ python -m nmt.nmt \
     --attention=scaled_luong \
     --decay_steps=1000 \
     --decay_factor=0.9 \
-	--word_embed=None \
+    --word_embed=None \
     --batch_size=256 \
-	--temperature=1.0 \
-	--decoder_type=sampling
+    --temperature=1.0 \
+    --decoder_type=sampling
 
 ```
 The above command trains a 4-layer, 256-batch size bi-directional LSTM seq2seq model with 128-dim hidden units and embeddings for 15 epochs. We use a dropout value of 0.2 (keep probability 0.8), and decay learning rate of 0.9 every 10000 steps. We use attention model scaled_luong. "temperature" and "decoder_type" are not used in training, but will be useful in the inference part, so we encourage you to specify them here. You are feel to tweak all these parameters.
