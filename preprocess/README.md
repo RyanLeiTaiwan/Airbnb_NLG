@@ -1,6 +1,6 @@
-# Data Preprocessing Steps
+# Preprocessing Steps (Before Model Training and Inference)
 
-### We downloaded the csv data of Airbnb from (http://insideairbnb.com/get-the-data.html).</h3>
+### We downloaded Airbnb CSV files of 44 cities worldwide from (http://insideairbnb.com/get-the-data.html) (Detailed Listings).
 
 ### Step 0: Convert all end-of-line characters into unix "LF" format
 
