@@ -1,4 +1,4 @@
-# Neural Machine Translation (seq2seq) Tutorial
+# seq2seq Model Tutorial
 
 Original tutorial at (https://github.com/tensorflow/nmt/tree/tf-1.4)
 
@@ -72,9 +72,9 @@ After you complete the training part, the model will be stored in the directory 
 
 ``` shell
 python -m nmt.nmt 
-	--inference_input_file=<path_to_data>
-	--out_dir=<path_to_model> 
-	--inference_output_file=<path_to_output>
+	--inference_input_file=<path_to_data> \
+	--out_dir=<path_to_model> \
+	--inference_output_file=<path_to_output> 
 ```
 
 The generated description will be in the output directory. Each line of information will lead to one line of description. In our pipeline, we don't really use this command, but use the one below.
