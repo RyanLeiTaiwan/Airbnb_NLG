@@ -13,7 +13,7 @@ mkdir <dir_name>
 ```
 Run the following command to do the training
 ``` shell
-cd nmt
+cd nmt-tf-1.4
 python -m nmt.nmt \
     --src=data --tgt=desc \
     --vocab_prefix=<path>/vocab  \
@@ -59,7 +59,7 @@ If no error, you should see logs similar to the below with decreasing perplexity
   epoch 0 step 500 lr 1 step-time 0.95s wps 5.89K ppl 205.85 bleu 0.00
 ```
 
-See [**train.py**](nmt/train.py) for more details.
+The model will be stored in the model directory you specified. See [**train.py**](nmt/train.py) for more details.
 
 We can start Tensorboard to view the summary of the model during training:
 
@@ -67,8 +67,13 @@ We can start Tensorboard to view the summary of the model during training:
 tensorboard --port 22222 --logdir <dir_name>
 ```
 
-## Inference
-After you complete the training part, the model will be stored in the directory you specified. Enter that directory, open the "hparams" file and check whether the <b>decoder_type</b> has been specified as <b>sampling</b>, and whether <b>temperature</b> is a reasonable value. Then, use the following command
+## Manually Change Hyperparameters Before Inference
+Since you will use *sampling decoder* for inference (in contrast to *greedy decoder* for training), you need to first manually change the hyperparameter file. To do this, enter the model directory. Edit the `hparams` file to set `"decoder_type": "sampling"` and `"temperature": TEMPERATURE_VALUE` (default to 1.0).
+
+## (Not Used) Inference
+**Note: In our pipeline, we don't really use this command, but use the one below.**
+
+The standard inference command is
 
 ``` shell
 python -m nmt.nmt 
@@ -77,10 +82,10 @@ python -m nmt.nmt
 	--inference_output_file=<path_to_output> 
 ```
 
-The generated description will be in the output directory. Each line of information will lead to one line of description. In our pipeline, we don't really use this command, but use the one below.
+The generated description will be in the output directory. Each line in the input file will correspond to one line of description in the output file. 
 
-## Inference Multiple Descriptions
-To increase diversification, instead of just generating one description for one property, we will generate multiple descriptions, and later select from them. The script *infer_multiple.py* is used to do this. Use the following command
+## Infer Multiple Descriptions
+To increase variety, instead of just generating one description for one property, we will generate multiple descriptions, and later select from them. The script *infer_multiple.py* is used to do this. Use the following command
 
 ``` shell
 python infer_multiple.py 
@@ -90,7 +95,7 @@ python infer_multiple.py
 	--num_sent 20
 ```
 
-This command will generate and then merge the output to a single file named *merged_output*. It will contain 20 descriptions for each property. You will then use the script inside the postprocessing folder on this output file.
+This command will invoke inference multiple times and merge multiple outputs to a single file named *merged_output*. It will contain 20 descriptions for each property. You will then use the script inside the `postprocessing` folder on this output file.
 
 ## Appendix
 One thing to note is that this seq2seq model is used for a single topic. In this way, if you decide to describe a property from 5 different topics (e.g., nearby attractions, transit, amenity), you will need to prepare the dataset for each topic, and train/inference according to the above tutorial for each topic.
