@@ -126,7 +126,7 @@ def build_parser():
         help='Test set CSV file'
     )
     parser.add_argument(
-        '-rk', '--rank',
+        '-r', '--rank',
         required=True,
         nargs='+',
         help='1+ NLG ranked output files (.rank) in topic order'
